@@ -74,14 +74,14 @@ void Player::Tick(GameData* _GD)
 	}
 
 	//limit motion of the player
-	float length = m_pos.Length();
-	float maxLength = 500.0f;
-	if (length > maxLength)
-	{
-		m_pos.Normalize();
-		m_pos *= maxLength;
-		m_vel *= -0.9; //VERY simple bounce back
-	}
+	//float length = m_pos.Length();
+	//float maxLength = 500.0f;
+	//if (length > maxLength)
+	//{
+	//	m_pos.Normalize();
+	//	m_pos *= maxLength;
+	//	m_vel *= -0.9; //VERY simple bounce back
+	//}
 
 	//apply my base behaviour
 	CMOGO::Tick(_GD);

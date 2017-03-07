@@ -1,6 +1,7 @@
 #include "VBTerrain.h"
 #include <iostream>
 #include <random>
+#include <array>
 
 void VBTerrain::init(int _size, ID3D11Device* GD)
 {
@@ -11,7 +12,7 @@ void VBTerrain::init(int _size, ID3D11Device* GD)
 
 	//calculate number of vertices and primitives
 	int numVerts = 6 * (m_width) * (m_height);
-	int gridPoints = (m_width + 1) * (m_height + 1);
+	int gridPoints = (m_width) * (m_height);
 	m_heightmap = new myVertex[gridPoints];
 	m_numPrims = numVerts / 3;
 	m_vertices = new myVertex[numVerts];
@@ -30,9 +31,6 @@ void VBTerrain::init(int _size, ID3D11Device* GD)
 		m_heightmap[i].Pos = Vector3::Zero;
 		m_heightmap[i].Pos.y = rand() % 4 + 0;
 	}
-
-	//m_heightmap[7].Pos.y = 1.0f;
-	//m_heightmap[8].Pos.y = 3.0f;
 
 	//in each loop create the two traingles for the matching sub-square on each of the six faces
 	int vert = 0;
@@ -110,9 +108,9 @@ void VBTerrain::Transform()
 
 	//std::cout << m_heightmap[currentHeightMap].Pos.y;
 
-	for (int i = 0; i < m_width; i++)
+	for (int i = 0; i < m_width - 1 ; i++)
 	{
-		for (int j = 0; j < m_height; j++)
+		for (int j = 0; j < m_height - 1; j++)
 		{
 			//top
 			//1
@@ -122,16 +120,16 @@ void VBTerrain::Transform()
 			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + 1].Pos.y;
 
 			//3
-			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height + 1].Pos.y;
+			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height].Pos.y;
 
 			//3
-			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height + 1].Pos.y;
+			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height].Pos.y;
 
 			//2
 			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + 1].Pos.y;
 
 			//4
-			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_width + 1].Pos.y;
+			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height + 1].Pos.y;
 			//std::cout << m_heightmap[currentHeightMap].Pos.y << "\n";
 
 			currentHeightMap++;

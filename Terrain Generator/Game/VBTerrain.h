@@ -27,7 +27,7 @@ protected:
 	myVertex* m_vertices;
 	myVertex* m_heightmap;
 	int m_width = 100;
-	int m_height = 99;
+	int m_height = 100;
 };
 
 #endif
