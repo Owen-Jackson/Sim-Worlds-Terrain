@@ -149,6 +149,7 @@
     <ClInclude Include="VBSnail.h" />
     <ClInclude Include="VBSpiked.h" />
     <ClInclude Include="VBspiral.h" />
+    <ClInclude Include="VBTerrain.h" />
     <ClInclude Include="vertex.h" />
   </ItemGroup>
   <ItemGroup>
@@ -170,6 +171,7 @@
     <ClCompile Include="VBCube.cpp" />
     <ClCompile Include="VBGO.cpp" />
     <ClCompile Include="VBSnail.cpp" />
+    <ClCompile Include="VBTerrain.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

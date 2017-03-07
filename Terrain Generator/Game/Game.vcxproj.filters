@@ -132,6 +132,9 @@
     <ClInclude Include="VBCube.h">
       <Filter>Objects\Example VBGOs\Headers</Filter>
     </ClInclude>
+    <ClInclude Include="VBTerrain.h">
+      <Filter>Objects\Example VBGOs\Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -187,6 +190,9 @@
     </ClCompile>
     <ClCompile Include="TextGO2D.cpp">
       <Filter>Objects\2D\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="VBTerrain.cpp">
+      <Filter>Objects\Example VBGOs\Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

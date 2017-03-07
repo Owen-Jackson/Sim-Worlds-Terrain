@@ -19,6 +19,7 @@
 #include "VBSnail.h"
 #include "fileVBGO.h"
 #include "MarchCubes.h"
+#include "VBTerrain.h"
 
 //and 2-D ones here
 #include "GameObject2D.h"

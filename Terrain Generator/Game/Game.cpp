@@ -103,71 +103,78 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	m_DD->m_cam = m_cam;
 	m_DD->m_light = m_light;
 
-	//add random content to show the various what you've got here
-	Terrain* terrain = new Terrain("table.cmo", _pd3dDevice, m_fxFactory, Vector3(100.0f, 0.0f, 100.0f), 0.0f, 0.0f, 0.0f, 0.25f * Vector3::One);
+	//Add terrain from the terrain generator
+	VBTerrain* terrain = new VBTerrain();
+	terrain->init(11, _pd3dDevice);
+	terrain->SetScale(4.0f, 1.0f, 4.0f);
+	terrain->SetPos(Vector3(-10.0f, 0.0f, -10.0f));
 	m_GameObjects.push_back(terrain);
 
-	//add some stuff to show off
+	////add random content to show the various what you've got here
+	//Terrain* terrain = new Terrain("table.cmo", _pd3dDevice, m_fxFactory, Vector3(100.0f, 0.0f, 100.0f), 0.0f, 0.0f, 0.0f, 0.25f * Vector3::One);
+	//m_GameObjects.push_back(terrain);
 
-	FileVBGO* terrainBox = new FileVBGO("../Assets/terrainTex.txt", _pd3dDevice);
-	m_GameObjects.push_back(terrainBox);
+	////add some stuff to show off
 
-	FileVBGO* Box = new FileVBGO("../Assets/cube.txt", _pd3dDevice);
-	m_GameObjects.push_back(Box);
-	Box->SetPos(Vector3(0.0f, 0.0f, -100.0f));
-	Box->SetPitch(XM_PIDIV4);
-	Box->SetScale(20.0f);
+	//FileVBGO* terrainBox = new FileVBGO("../Assets/terrainTex.txt", _pd3dDevice);
+	//m_GameObjects.push_back(terrainBox);
 
-	//L-system like tree
-	m_GameObjects.push_back(new Tree(4, 4, .6f, 10.0f *Vector3::Up, XM_PI/6.0f, "JEMINA vase -up.cmo", _pd3dDevice, m_fxFactory));
+	//FileVBGO* Box = new FileVBGO("../Assets/cube.txt", _pd3dDevice);
+	//m_GameObjects.push_back(Box);
+	//Box->SetPos(Vector3(0.0f, 0.0f, -100.0f));
+	//Box->SetPitch(XM_PIDIV4);
+	//Box->SetScale(20.0f);
 
-	VBCube* cube = new VBCube();
-	cube->init(11, _pd3dDevice);
-	cube->SetPos(Vector3(100.0f, 0.0f, 0.0f));
-	cube->SetScale(4.0f);
-	m_GameObjects.push_back(cube);
+	////L-system like tree
+	//m_GameObjects.push_back(new Tree(4, 4, .6f, 10.0f *Vector3::Up, XM_PI/6.0f, "JEMINA vase -up.cmo", _pd3dDevice, m_fxFactory));
 
-	VBSpike* spikes = new VBSpike();
-	spikes->init(11, _pd3dDevice);
-	spikes->SetPos(Vector3(0.0f, 0.0f, 100.0f));
-	spikes->SetScale(4.0f);
-	m_GameObjects.push_back(spikes);
+	//VBCube* cube = new VBCube();
+	//cube->init(11, _pd3dDevice);
+	//cube->SetPos(Vector3(100.0f, 0.0f, 0.0f));
+	//cube->SetScale(4.0f);
+	//m_GameObjects.push_back(cube);
 
-	VBSpiral* spiral = new VBSpiral();
-	spiral->init(11, _pd3dDevice);
-	spiral->SetPos(Vector3(-100.0f, 0.0f, 0.0f));
-	spiral->SetScale(4.0f);
-	m_GameObjects.push_back(spiral);
+	//VBSpike* spikes = new VBSpike();
+	//spikes->init(11, _pd3dDevice);
+	//spikes->SetPos(Vector3(0.0f, 0.0f, 100.0f));
+	//spikes->SetScale(4.0f);
+	//m_GameObjects.push_back(spikes);
 
-	VBPillow* pillow = new VBPillow();
-	pillow->init(11, _pd3dDevice);
-	pillow->SetPos(Vector3(-100.0f, 0.0f, -100.0f));
-	pillow->SetScale(4.0f);
-	m_GameObjects.push_back(pillow);
+	//VBSpiral* spiral = new VBSpiral();
+	//spiral->init(11, _pd3dDevice);
+	//spiral->SetPos(Vector3(-100.0f, 0.0f, 0.0f));
+	//spiral->SetScale(4.0f);
+	//m_GameObjects.push_back(spiral);
 
-	VBSnail* snail = new VBSnail(_pd3dDevice, "../Assets/baseline.txt", 150, 0.98f, 0.09f * XM_PI, 0.4f, Color(1.0f, 0.0f, 0.0f, 1.0f), Color(0.0f, 0.0f, 1.0f, 1.0f));
-	snail->SetPos(Vector3(-100.0f, 0.0f, 100.0f));
-	snail->SetScale(2.0f);
-	m_GameObjects.push_back(snail);
+	//VBPillow* pillow = new VBPillow();
+	//pillow->init(11, _pd3dDevice);
+	//pillow->SetPos(Vector3(-100.0f, 0.0f, -100.0f));
+	//pillow->SetScale(4.0f);
+	//m_GameObjects.push_back(pillow);
 
-	//Marching Cubes
-	VBMarchCubes* VBMC = new VBMarchCubes();
-	VBMC->init(Vector3(-8.0f, -8.0f, -17.0f), Vector3(8.0f, 8.0f,23.0f), 60.0f*Vector3::One, 0.01, _pd3dDevice);
-	VBMC->SetPos(Vector3(100,0,-100));
-	VBMC->SetPitch(-XM_PIDIV2);
-	VBMC->SetScale(Vector3(3, 3, 1.5));
-	m_GameObjects.push_back(VBMC);
+	//VBSnail* snail = new VBSnail(_pd3dDevice, "../Assets/baseline.txt", 150, 0.98f, 0.09f * XM_PI, 0.4f, Color(1.0f, 0.0f, 0.0f, 1.0f), Color(0.0f, 0.0f, 1.0f, 1.0f));
+	//snail->SetPos(Vector3(-100.0f, 0.0f, 100.0f));
+	//snail->SetScale(2.0f);
+	//m_GameObjects.push_back(snail);
+
+	////Marching Cubes
+	//VBMarchCubes* VBMC = new VBMarchCubes();
+	//VBMC->init(Vector3(-8.0f, -8.0f, -17.0f), Vector3(8.0f, 8.0f,23.0f), 60.0f*Vector3::One, 0.01, _pd3dDevice);
+	//VBMC->SetPos(Vector3(100,0,-100));
+	//VBMC->SetPitch(-XM_PIDIV2);
+	//VBMC->SetScale(Vector3(3, 3, 1.5));
+	//m_GameObjects.push_back(VBMC);
 
 
-	//example basic 2D stuff
-	ImageGO2D* logo = new ImageGO2D("logo_small", _pd3dDevice);
-	logo->SetPos(200.0f * Vector2::One);
-	m_GameObject2Ds.push_back(logo);
+	////example basic 2D stuff
+	//ImageGO2D* logo = new ImageGO2D("logo_small", _pd3dDevice);
+	//logo->SetPos(200.0f * Vector2::One);
+	//m_GameObject2Ds.push_back(logo);
 
-	TextGO2D* text = new TextGO2D("Test Text");
-	text->SetPos(Vector2(100, 10));
-	text->SetColour(Color((float*)&Colors::Yellow));
-	m_GameObject2Ds.push_back(text);
+	//TextGO2D* text = new TextGO2D("Test Text");
+	//text->SetPos(Vector2(100, 10));
+	//text->SetColour(Color((float*)&Colors::Yellow));
+	//m_GameObject2Ds.push_back(text);
 };
 
 
