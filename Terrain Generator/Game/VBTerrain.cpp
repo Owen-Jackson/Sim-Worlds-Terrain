@@ -38,7 +38,7 @@ void VBTerrain::init(int _size, ID3D11Device* GD)
 	{
 		for (int j = 0; j < m_width - 1; j++)
 		{
-			//top
+			//The comments below represent the vertex number in the current quad 
 			//1
 			m_vertices[vert].Color = Color(1.0f, 0.0f, 0.0f, 1.0f);
 			m_vertices[vert++].Pos = Vector3((float)i, (float)(0), (float)j);
@@ -62,7 +62,6 @@ void VBTerrain::init(int _size, ID3D11Device* GD)
 			//4
 			m_vertices[vert].Color = Color(0.0f, 0.0f, 0.0f, 1.0f);
 			m_vertices[vert++].Pos = Vector3((float)(i + 1), (float)(0), (float)(j + 1));
-
 		}
 	}
 
@@ -112,7 +111,7 @@ void VBTerrain::Transform()
 	{
 		for (int j = 0; j < m_height - 1; j++)
 		{
-			//top
+			//The comments below represent the vertex number in the current quad 
 			//1
 			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap].Pos.y;
 
