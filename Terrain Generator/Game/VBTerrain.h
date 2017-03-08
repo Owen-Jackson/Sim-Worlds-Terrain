@@ -24,10 +24,12 @@ protected:
 	void Transform();
 
 	int m_size;
+	int m_chunkNum;
+	int m_verticesPerChunk = 10000;
 	myVertex* m_vertices;
 	myVertex* m_heightmap;
-	int m_width = 100;
-	int m_height = 100;
+	int m_width = 200;
+	int m_height = 200;
 };
 
 #endif

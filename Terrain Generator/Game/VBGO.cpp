@@ -128,7 +128,8 @@ void VBGO::Draw(DrawData* _DD)
 	_DD->m_pd3dImmediateContext->PSSetSamplers(0, 1, &useSample);
 
 	//and draw
-	_DD->m_pd3dImmediateContext->DrawIndexed(3 * m_numPrims, 0, 0);//number here will need to change depending on the primative topology!
+	//_DD->m_pd3dImmediateContext->DrawIndexed(3 * m_numPrims, 0, 0);//number here will need to change depending on the primative topology!
+	_DD->m_pd3dImmediateContext->Draw(3 * m_numPrims, 0);
 }
 
 //--------------------------------------------------------------------------------------
@@ -292,5 +293,7 @@ void VBGO::BuildVB(ID3D11Device* _GD, int _numVerts, void* _vertices)
 	bd.CPUAccessFlags = 0;
 	ZeroMemory(&InitData, sizeof(InitData));
 	InitData.pSysMem = _vertices;
+	InitData.SysMemPitch = 0;
+	InitData.SysMemSlicePitch = 0;
 	hr = _GD->CreateBuffer(&bd, &InitData, &m_VertexBuffer);
 }

@@ -43,6 +43,15 @@
     <Filter Include="Objects\2D\Source">
       <UniqueIdentifier>{01e73c6e-7bcd-454a-8185-915670785862}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Terrain Generator">
+      <UniqueIdentifier>{6d80a245-2091-4934-9733-464e1bbcca2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Terrain Generator\Headers">
+      <UniqueIdentifier>{845b66e6-d3d6-44f4-bd40-2e1c9eb1eebf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Terrain Generator\Source">
+      <UniqueIdentifier>{022c7c10-17ac-4797-9c88-79d466c05e8c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -133,7 +142,10 @@
       <Filter>Objects\Example VBGOs\Headers</Filter>
     </ClInclude>
     <ClInclude Include="VBTerrain.h">
-      <Filter>Objects\Example VBGOs\Headers</Filter>
+      <Filter>Terrain Generator\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="QuadTree.h">
+      <Filter>Terrain Generator\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -192,7 +204,10 @@
       <Filter>Objects\2D\Source</Filter>
     </ClCompile>
     <ClCompile Include="VBTerrain.cpp">
-      <Filter>Objects\Example VBGOs\Source</Filter>
+      <Filter>Terrain Generator\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="QuadTree.cpp">
+      <Filter>Terrain Generator\Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

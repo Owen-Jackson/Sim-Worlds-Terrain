@@ -11,9 +11,22 @@ void VBTerrain::init(int _size, ID3D11Device* GD)
 	m_size = _size;
 
 	//calculate number of vertices and primitives
-	int numVerts = 6 * (m_width) * (m_height);
+	int numVerts = 6 * (m_width - 1) * (m_height - 1);
 	int gridPoints = (m_width) * (m_height);
 	m_heightmap = new myVertex[gridPoints];
+
+	int current = 0;
+	while (current < numVerts)
+	{
+		if (current % m_verticesPerChunk == 0)
+		{
+			std::cout << current << std::endl;
+			m_chunkNum++;
+		}
+		current++;
+	}
+
+	std::cout << m_chunkNum << std::endl;
 	m_numPrims = numVerts / 3;
 	m_vertices = new myVertex[numVerts];
 	WORD* indices = new WORD[numVerts];
@@ -69,14 +82,18 @@ void VBTerrain::init(int _size, ID3D11Device* GD)
 	m_vertices[numVerts - 1].Color = Color(0.0f, 0.0f, 0.0f, 1.0f);
 	
 	//carry out some kind of transform on these vertices to make this object more interesting
-	Transform();
+	//Transform();
+	//std::cout << m_numPrims << std::endl;
+	//std::cout << numVerts << std::endl;
+	//std::cout << vert;
 
 	//calculate the normals for the basic lighting in the base shader
+	int count = 0;
 	for (int i = 0; i<m_numPrims; i++)
 	{
-		WORD V1 = 3 * i;
-		WORD V2 = 3 * i + 1;
-		WORD V3 = 3 * i + 2;
+		int V1 = 3 * i;
+		int V2 = 3 * i + 1;
+		int V3 = 3 * i + 2;
 
 		//build normals
 		Vector3 norm;
@@ -91,11 +108,24 @@ void VBTerrain::init(int _size, ID3D11Device* GD)
 	}
 
 	BuildIB(GD, indices);
-	BuildVB(GD, numVerts, m_vertices);
+	//myVertex* temp = new myVertex[m_verticesPerChunk];
+	//for (int loop = 0; loop < m_chunkNum - 1; loop++)
+	//{
+	//	for (int j = 0; j < m_verticesPerChunk - 1; j++)
+	//	{
+	//		temp[j].Pos = m_vertices[m_verticesPerChunk * loop + j].Pos;
+	//		temp[j].Color = m_vertices[m_verticesPerChunk * loop + j].Color;
+	//	}
+
+	//	BuildVB(GD, m_verticesPerChunk, temp);
+	//}
+	BuildVB(GD, numVerts - 1, m_vertices);
+
 
 	delete[] indices;    //this is no longer needed as this is now in the index Buffer
 	delete[] m_vertices; //this is no longer needed as this is now in the Vertex Buffer
 	delete[] m_heightmap;
+	//delete[] temp;
 	m_vertices = nullptr;
 	m_heightmap = nullptr;
 }
@@ -129,7 +159,6 @@ void VBTerrain::Transform()
 
 			//4
 			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height + 1].Pos.y;
-			//std::cout << m_heightmap[currentHeightMap].Pos.y << "\n";
 
 			currentHeightMap++;
 		}

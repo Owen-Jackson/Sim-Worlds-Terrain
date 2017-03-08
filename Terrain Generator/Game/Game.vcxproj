@@ -138,6 +138,7 @@
     <ClInclude Include="MarchCubes.h" />
     <ClInclude Include="ObjectList.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TextGO2D.h" />
     <ClInclude Include="TPSCamera.h" />
@@ -163,6 +164,7 @@
     <ClCompile Include="light.cpp" />
     <ClCompile Include="MarchCubes.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TextGO2D.cpp" />
     <ClCompile Include="TPSCamera.cpp" />

@@ -107,7 +107,7 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	VBTerrain* terrain = new VBTerrain();
 	terrain->init(11, _pd3dDevice);
 	terrain->SetScale(4.0f, 1.0f, 4.0f);
-	terrain->SetPos(Vector3(-100.0f, 0.0f, -100.0f));
+	terrain->SetPos(Vector3(0.0f, 0.0f, 0.0f));
 	m_GameObjects.push_back(terrain);
 
 	////add random content to show the various what you've got here
