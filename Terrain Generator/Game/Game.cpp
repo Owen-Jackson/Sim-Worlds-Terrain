@@ -12,6 +12,8 @@
 #include "drawdata.h"
 #include "DrawData2D.h"
 
+#include <AntTweakBar.h>
+
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 

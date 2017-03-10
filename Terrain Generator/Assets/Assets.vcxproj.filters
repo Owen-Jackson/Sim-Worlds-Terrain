@@ -16,6 +16,9 @@
     <Filter Include="Textures">
       <UniqueIdentifier>{d0ca2129-2972-476d-82a9-1f0a9000b117}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HeightMaps">
+      <UniqueIdentifier>{37886da4-c424-440c-b763-2ee32768c2de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="italic.spritefont">
@@ -56,6 +59,9 @@
     </ImageContentTask>
     <ImageContentTask Include="logo_small.png">
       <Filter>Textures</Filter>
+    </ImageContentTask>
+    <ImageContentTask Include="Heightmaps\TestMap.bmp">
+      <Filter>HeightMaps</Filter>
     </ImageContentTask>
   </ItemGroup>
 </Project>

@@ -17,6 +17,8 @@ public:
 
 	//initialise the Veretx and Index buffers for the cube
 	void init(int _size, ID3D11Device* _GD);
+	bool readFromBmp(char* _filename);
+	void normaliseHeightmap();
 
 protected:
 	//this is to allow custom versions of this which create the basic cube and then distort it
@@ -30,6 +32,7 @@ protected:
 	myVertex* m_heightmap;
 	int m_width = 200;
 	int m_height = 200;
+
 };
 
 #endif
