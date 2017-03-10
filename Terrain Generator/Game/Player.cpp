@@ -11,29 +11,26 @@ Player::Player(string _fileName, ID3D11Device* _pd3dDevice, IEffectFactory* _EF)
 
 	SetDrag(0.7);
 	SetPhysicsOn(true);
+	m_isVisible = false;
 }
 
 Player::~Player()
 {
 	//tidy up anything I've created
+	delete m_FPSCam;
 }
 
 
 void Player::Tick(GameData* _GD)
 {
-	switch (_GD->m_GS)
+	if (_GD->m_GS == GS_PLAY_MAIN_CAM)
 	{
-	case GS_PLAY_MAIN_CAM:
-	{
-		{
-			//MOUSE CONTROL SCHEME HERE
-			float speed = 10.0f;
-			m_acc.x += speed * _GD->m_mouseState->lX;
-			m_acc.z += speed * _GD->m_mouseState->lY;
-			break;
-		}
+		//MOUSE CONTROL SCHEME HERE
+		float speed = 10.0f;
+		m_acc.x += speed * _GD->m_mouseState->lX;
+		m_acc.z += speed * _GD->m_mouseState->lY;
 	}
-	case GS_PLAY_TPS_CAM:
+	else if (_GD->m_GS == GS_PLAY_TPS_CAM || _GD->m_GS == GS_PLAY_FPS_CAM)
 	{
 		//TURN AND FORWARD CONTROL HERE
 		Vector3 forwardMove = 40.0f * Vector3::Forward;
@@ -47,19 +44,25 @@ void Player::Tick(GameData* _GD)
 		{
 			m_acc -= forwardMove;
 		}
-		break;
-	}
 	}
 
-	//change orinetation of player
-	float rotSpeed = 2.0f * _GD->m_dt;
-	if (_GD->m_keyboardState[DIK_A] & 0x80)
+	//change orientation of player
+	if (_GD->m_GS != GS_PLAY_FPS_CAM)
 	{
-		m_yaw += rotSpeed;
+		float rotSpeed = 2.0f * _GD->m_dt;
+		if (_GD->m_keyboardState[DIK_A] & 0x80)
+		{
+			m_yaw += rotSpeed;
+		}
+		if (_GD->m_keyboardState[DIK_D] & 0x80)
+		{
+			m_yaw -= rotSpeed;
+		}
 	}
-	if (_GD->m_keyboardState[DIK_D] & 0x80)
+
+	if (_GD->m_GS == GS_PLAY_FPS_CAM)
 	{
-		m_yaw -= rotSpeed;
+		m_yaw -= _GD->m_mouseState->lX * 0.01;
 	}
 
 	//move player up and down

@@ -36,6 +36,8 @@ public:
 	bool		IsPhysicsOn() { return m_physicsOn; }
 	float		GetDrag() { return m_drag; }
 
+	bool		GetIsVisible() { return m_isVisible; };
+
 	//setters
 	void		SetPos(Vector3 _pos) { m_pos = _pos; }
 
@@ -52,6 +54,7 @@ public:
 	void		TogglePhysics() { m_physicsOn = !m_physicsOn; }
 	void		SetDrag(float _drag) { m_drag = _drag; }
 
+	void		ToggleIsVisible() { m_isVisible = !m_isVisible; };
 
 protected:
 
@@ -68,6 +71,7 @@ protected:
 	float m_drag = 0.0f;
 	Vector3 m_vel = Vector3::Zero;
 	Vector3 m_acc = Vector3::Zero;
+	bool m_isVisible = true;
 };
 
 #endif

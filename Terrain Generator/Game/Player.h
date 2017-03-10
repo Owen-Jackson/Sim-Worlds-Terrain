@@ -1,6 +1,7 @@
 #ifndef _PLAYER_H_
 #define _PLAYER_H_
 #include "CMOGO.h"
+#include "camera.h"
 
 //=================================================================
 //Base Player Class (i.e. a GO the player controls)
@@ -16,7 +17,7 @@ public:
 	virtual void Tick(GameData* _GD) override;
 
 protected:
-
+	Camera* m_FPSCam = nullptr;
 };
 
 #endif

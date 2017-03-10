@@ -13,6 +13,7 @@
 #include "DrawData2D.h"
 
 #include <AntTweakBar.h>
+#include <iostream>
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -97,6 +98,10 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	//add a secondary camera
 	m_TPScam = new TPSCamera(0.25f * XM_PI, AR, 1.0f, 10000.0f, pPlayer, Vector3::UnitY, Vector3(0.0f, 10.0f, 50.0f));
 	m_GameObjects.push_back(m_TPScam);
+
+	//add an fps camera
+	m_FPScam = new FPSCam(0.25f * XM_PI, AR, 1.0f, 10000.0f, pPlayer, Vector3::UnitY);
+	m_GameObjects.push_back(m_FPScam);
 
 	//create DrawData struct and populate its pointers
 	m_DD = new DrawData;
@@ -271,6 +276,7 @@ bool Game::Tick()
 		break;
 	case GS_PLAY_MAIN_CAM:
 	case GS_PLAY_TPS_CAM:
+	case GS_PLAY_FPS_CAM:
 		PlayTick();
 		break;
 	}
@@ -281,16 +287,25 @@ bool Game::Tick()
 void Game::PlayTick()
 {
 	//upon space bar switch camera state
-	if ((m_keyboardState[DIK_SPACE] & 0x80) && !(m_prevKeyboardState[DIK_SPACE] & 0x80))
+	if ((m_keyboardState[DIK_1] & 0x80) && !(m_prevKeyboardState[DIK_1] & 0x80) && m_GD->m_GS != GS_PLAY_MAIN_CAM)
 	{
-		if (m_GD->m_GS == GS_PLAY_MAIN_CAM)
+		m_GD->m_GS = GS_PLAY_MAIN_CAM;
+		/*if (m_GD->m_GS == GS_PLAY_MAIN_CAM)
 		{
 			m_GD->m_GS = GS_PLAY_TPS_CAM;
 		}
 		else
 		{
 			m_GD->m_GS = GS_PLAY_MAIN_CAM;
-		}
+		}*/
+	}
+	else if ((m_keyboardState[DIK_2] & 0x80) && !(m_prevKeyboardState[DIK_2] & 0x80) && m_GD->m_GS != GS_PLAY_TPS_CAM)
+	{
+		m_GD->m_GS = GS_PLAY_TPS_CAM;
+	}
+	else if ((m_keyboardState[DIK_3] & 0x80) && !(m_prevKeyboardState[DIK_3] & 0x80) && m_GD->m_GS != GS_PLAY_FPS_CAM)
+	{
+		m_GD->m_GS = GS_PLAY_FPS_CAM;
 	}
 
 	//update all objects
@@ -311,9 +326,18 @@ void Game::Draw(ID3D11DeviceContext* _pd3dImmediateContext)
 
 	//set which camera to be used
 	m_DD->m_cam = m_cam;
+
+	if (m_GD->m_GS == GS_PLAY_MAIN_CAM)
+	{
+		m_DD->m_cam = m_cam;
+	}
 	if (m_GD->m_GS == GS_PLAY_TPS_CAM)
 	{
 		m_DD->m_cam = m_TPScam;
+	}
+	if (m_GD->m_GS == GS_PLAY_FPS_CAM)
+	{
+		m_DD->m_cam = m_FPScam;
 	}
 
 	//update the constant buffer for the rendering of VBGOs
@@ -322,7 +346,10 @@ void Game::Draw(ID3D11DeviceContext* _pd3dImmediateContext)
 	//draw all objects
 	for (list<GameObject *>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
 	{
-		(*it)->Draw(m_DD);
+		if ((*it)->GetIsVisible())
+		{
+			(*it)->Draw(m_DD);
+		}
 	}
 
 	// Draw sprite batch stuff 

@@ -129,6 +129,7 @@
     <ClInclude Include="DrawData2D.h" />
     <ClInclude Include="DrawData.h" />
     <ClInclude Include="fileVBGO.h" />
+    <ClInclude Include="FPSCam.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameData.h" />
     <ClInclude Include="gameobject.h" />
@@ -159,6 +160,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="CMOGO.cpp" />
     <ClCompile Include="fileVBGO.cpp" />
+    <ClCompile Include="FPSCam.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="gameobject.cpp" />
     <ClCompile Include="GameObject2D.cpp" />

@@ -10,6 +10,7 @@
 #include "Player.h"
 #include "Terrain.h"
 #include "Tree.h"
+#include "FPSCam.h"
 
 //VBGO examples
 #include "VBCube.h"

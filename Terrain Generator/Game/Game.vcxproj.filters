@@ -147,6 +147,9 @@
     <ClInclude Include="QuadTree.h">
       <Filter>Terrain Generator\Headers</Filter>
     </ClInclude>
+    <ClInclude Include="FPSCam.h">
+      <Filter>Objects\Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -208,6 +211,9 @@
     </ClCompile>
     <ClCompile Include="QuadTree.cpp">
       <Filter>Terrain Generator\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="FPSCam.cpp">
+      <Filter>Objects\Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

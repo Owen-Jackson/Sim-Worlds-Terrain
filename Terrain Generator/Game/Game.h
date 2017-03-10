@@ -23,6 +23,7 @@ class GameObject;
 class GameObject2D;
 class Camera;
 class TPSCamera;
+class FPSCam;
 struct GameData;
 struct DrawData;
 struct DrawData2D;
@@ -43,7 +44,8 @@ protected:
 	DWORD m_playTime; //amount of time since the game started
 
 	Camera* m_cam; //principle camera
-	TPSCamera* m_TPScam;//TPS cam
+	TPSCamera* m_TPScam; //TPS cam
+	FPSCam* m_FPScam; //FPS camera
 	Light* m_light; //base light
 
 	list<GameObject *> m_GameObjects; //data structure storing all GameObjects of this Game

@@ -9,7 +9,7 @@ void VBTerrain::init(int _size, ID3D11Device* GD)
 	//but it does give you a very clear idea of what is actually going on
 
 	m_size = _size;
-	readFromBmp("../Assets/HeightMaps/Australia.bmp");
+	readFromBmp("../Assets/HeightMaps/TestMap.bmp");
 	//calculate number of vertices and primitives
 	int numVerts = 6 * (m_width - 1) * (m_height - 1);
 	int gridPoints = (m_width) * (m_height);
