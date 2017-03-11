@@ -33,7 +33,7 @@ void Player::Tick(GameData* _GD)
 	else if (_GD->m_GS == GS_PLAY_TPS_CAM || _GD->m_GS == GS_PLAY_FPS_CAM)
 	{
 		//TURN AND FORWARD CONTROL HERE
-		Vector3 forwardMove = 40.0f * Vector3::Forward;
+		Vector3 forwardMove = 50.0f * Vector3::Forward;
 		Matrix rotMove = Matrix::CreateRotationY(m_yaw);
 		forwardMove = Vector3::Transform(forwardMove, rotMove);
 		if (_GD->m_keyboardState[DIK_W] & 0x80)
@@ -62,7 +62,19 @@ void Player::Tick(GameData* _GD)
 
 	if (_GD->m_GS == GS_PLAY_FPS_CAM)
 	{
-		m_yaw -= _GD->m_mouseState->lX * 0.01;
+		//allow left/right movement with keyboard input
+		Vector3 sideMove = 40.0f * Vector3::Right;
+		Matrix rotMove = Matrix::CreateRotationY(m_yaw);
+		sideMove = Vector3::Transform(sideMove, rotMove);
+		if (_GD->m_keyboardState[DIK_D] & 0x80)
+		{
+			m_acc += sideMove;
+		}
+		if (_GD->m_keyboardState[DIK_A] & 0x80)
+		{
+			m_acc -= sideMove;
+		}
+		m_yaw -= _GD->m_mouseState->lX * 0.01;	//change player orientation with mouse input
 	}
 
 	//move player up and down

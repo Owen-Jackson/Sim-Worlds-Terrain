@@ -113,7 +113,7 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	//Add terrain from the terrain generator
 	VBTerrain* terrain = new VBTerrain();
 	terrain->init(11, _pd3dDevice);
-	terrain->SetScale(4.0f, 1.0f, 4.0f);
+	terrain->SetScale(1.0f, 1.0f, 1.0f);
 	terrain->SetPos(Vector3(0.0f, 0.0f, 0.0f));
 	m_GameObjects.push_back(terrain);
 

@@ -29,9 +29,10 @@ protected:
 	int m_chunkNum;
 	int m_verticesPerChunk = 10000;
 	myVertex* m_vertices;
-	myVertex* m_heightmap;
+	int* m_heightmap;
 	int m_width = 200;
 	int m_height = 200;
+	//Vector2* textureMap;
 
 };
 

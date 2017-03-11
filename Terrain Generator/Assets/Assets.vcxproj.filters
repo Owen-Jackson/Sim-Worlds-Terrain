@@ -63,5 +63,14 @@
     <ImageContentTask Include="Heightmaps\TestMap.bmp">
       <Filter>HeightMaps</Filter>
     </ImageContentTask>
+    <ImageContentTask Include="Textures\Debug Texture.jpg">
+      <Filter>Textures</Filter>
+    </ImageContentTask>
+    <ImageContentTask Include="Textures\Orientation debug.png">
+      <Filter>Textures</Filter>
+    </ImageContentTask>
+    <ImageContentTask Include="Textures\Ground.jpg">
+      <Filter>Textures</Filter>
+    </ImageContentTask>
   </ItemGroup>
 </Project>

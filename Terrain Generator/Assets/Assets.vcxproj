@@ -173,6 +173,15 @@
   <ItemGroup>
     <ImageContentTask Include="Heightmaps\TestMap.bmp" />
   </ItemGroup>
+  <ItemGroup>
+    <ImageContentTask Include="Textures\Debug Texture.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ImageContentTask Include="Textures\Orientation debug.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ImageContentTask Include="Textures\Ground.jpg" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\ImageContentTask.targets" />

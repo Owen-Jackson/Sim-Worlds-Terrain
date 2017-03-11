@@ -1,4 +1,6 @@
 #include "VBTerrain.h"
+#include "DDSTextureLoader.h"
+#include "Helper.h"
 #include <iostream>
 #include <random>
 #include <array>
@@ -12,8 +14,6 @@ void VBTerrain::init(int _size, ID3D11Device* GD)
 	readFromBmp("../Assets/HeightMaps/TestMap.bmp");
 	//calculate number of vertices and primitives
 	int numVerts = 6 * (m_width - 1) * (m_height - 1);
-	int gridPoints = (m_width) * (m_height);
-	//m_heightmap = new myVertex[gridPoints];
 
 	int current = 0;
 	while (current < numVerts)
@@ -53,28 +53,46 @@ void VBTerrain::init(int _size, ID3D11Device* GD)
 		{
 			//The comments below represent the vertex number in the current quad 
 			//1
-			m_vertices[vert].Color = Color(1.0f, 0.0f, 0.0f, 1.0f);
-			m_vertices[vert++].Pos = Vector3((float)i, (float)(0), (float)j);
-
-			//2
-			m_vertices[vert].Color = Color(1.0f, 1.0f, 0.0f, 1.0f);
-			m_vertices[vert++].Pos = Vector3((float)i, (float)(0), (float)(j + 1));
-
-			//3
-			m_vertices[vert].Color = Color(0.0f, 1.0f, 1.0f, 1.0f);
-			m_vertices[vert++].Pos = Vector3((float)(i + 1), (float)(0), (float)j);
-
-			//3
-			m_vertices[vert].Color = Color(1.0f, 0.0f, 1.0f, 1.0f);
-			m_vertices[vert++].Pos = Vector3((float)(i + 1), (float)(0), (float)j);
+			m_vertices[vert].Color = Color(1.0f, 1.0f, 1.0f, 1.0f);
+			m_vertices[vert].Pos = Vector3((float)i, (float)(0), (float)j);
+			m_vertices[vert].texCoord.x = 1.0f;
+			m_vertices[vert].texCoord.y = 1.0f;
+			vert++;
 
 			//2
 			m_vertices[vert].Color = Color(1.0f, 1.0f, 1.0f, 1.0f);
-			m_vertices[vert++].Pos = Vector3((float)i, (float)(0), (float)(j + 1));
+			m_vertices[vert].Pos = Vector3((float)i, (float)(0), (float)(j + 1));
+			m_vertices[vert].texCoord.x = 1.0f;
+			m_vertices[vert].texCoord.y = 0.0f;
+			vert++;
+
+			//3
+			m_vertices[vert].Color = Color(1.0f, 1.0f, 1.0f, 1.0f);
+			m_vertices[vert].Pos = Vector3((float)(i + 1), (float)(0), (float)j);
+			m_vertices[vert].texCoord.x = 0.0f;
+			m_vertices[vert].texCoord.y = 1.0f;
+			vert++;
+
+			//3
+			m_vertices[vert].Color = Color(1.0f, 1.0f, 1.0f, 1.0f);
+			m_vertices[vert].Pos = Vector3((float)(i + 1), (float)(0), (float)j);
+			m_vertices[vert].texCoord.x = 0.0f;
+			m_vertices[vert].texCoord.y = 1.0f;
+			vert++;
+
+			//2
+			m_vertices[vert].Color = Color(1.0f, 1.0f, 1.0f, 1.0f);
+			m_vertices[vert].Pos = Vector3((float)i, (float)(0), (float)(j + 1));
+			m_vertices[vert].texCoord.x = 1.0f;
+			m_vertices[vert].texCoord.y = 0.0f;
+			vert++;
 
 			//4
-			m_vertices[vert].Color = Color(0.0f, 0.0f, 0.0f, 1.0f);
-			m_vertices[vert++].Pos = Vector3((float)(i + 1), (float)(0), (float)(j + 1));
+			m_vertices[vert].Color = Color(1.0f, 1.0f, 1.0f, 1.0f);
+			m_vertices[vert].Pos = Vector3((float)(i + 1), (float)(0), (float)(j + 1));
+			m_vertices[vert].texCoord.x = 0.0f;
+			m_vertices[vert].texCoord.y = 0.0f;
+			vert++;
 		}
 	}
 
@@ -101,6 +119,9 @@ void VBTerrain::init(int _size, ID3D11Device* GD)
 		m_vertices[V3].Norm = norm;
 	}
 
+	//load texture
+	HRESULT hr = CreateDDSTextureFromFile(GD, Helper::charToWChar("../Debug/Ground.dds"), nullptr, &m_pTextureRV);
+
 	BuildIB(GD, indices);
 	BuildVB(GD, numVerts, m_vertices);
 
@@ -117,28 +138,28 @@ void VBTerrain::Transform()
 	int vert = 0;
 	int currentHeightMap = 0;
 
-	for (int i = 0; i < m_width - 1 ; i++)
+	for (int i = 0; i < m_width - 1; i++)
 	{
 		for (int j = 0; j < m_height - 1; j++)
 		{
 			//The comments below represent the vertex number in the current quad 
 			//1
-			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap].Pos.y;
+			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap];
 
 			//2
-			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + 1].Pos.y;
+			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + 1];
 
 			//3
-			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height].Pos.y;
-
+			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height];
+			
 			//3
-			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height].Pos.y;
+			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height];
 
 			//2
-			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + 1].Pos.y;
+			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + 1];
 
 			//4
-			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height + 1].Pos.y;
+			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height + 1];
 
 			currentHeightMap++;
 		}
@@ -146,6 +167,7 @@ void VBTerrain::Transform()
 	}
 }
 
+//This tutorial was used as a guide to creating this function http://www.rastertek.com/dx11ter02.html
 bool VBTerrain::readFromBmp(char* _filename)
 {
 	//create file related variables
@@ -186,6 +208,14 @@ bool VBTerrain::readFromBmp(char* _filename)
 
 	//calculate the size of the image data
 	int imageSize = m_width * m_height * 3;
+	
+	//if image size is odd add another byte to each line
+	if (m_width % 2 == 1)
+	{
+		imageSize = ((m_width * 3) + 1) * m_height;
+	}
+
+	std::cout << imageSize << std::endl;
 
 	//allocate memory for the bitmap image data
 	bitmapImage = new unsigned char[imageSize];
@@ -214,7 +244,7 @@ bool VBTerrain::readFromBmp(char* _filename)
 	}
 
 	//create the heightmap that stores the data
-	m_heightmap = new myVertex[m_width * m_height];
+	m_heightmap = new int[m_width * m_height];
 	if (!m_heightmap)
 	{
 		return false;
@@ -234,16 +264,19 @@ bool VBTerrain::readFromBmp(char* _filename)
 		{
 			height = bitmapImage[position];
 
-			index = (m_height * i) + j;
+			index = (m_width * i) + j;
 
-			m_heightmap[index].Pos.x = (float)j;
-			m_heightmap[index].Pos.y = (float)height;
-			m_heightmap[index].Pos.z = (float)i;
+			m_heightmap[index] = (float)height;
 
 			position+=3;
 		}
+		//need to increment again to compensate for the extra byte for odd sizes
+		if (m_width % 2 == 1)
+		{
+			position++;
+		}
 	}
-
+	
 	normaliseHeightmap();
 
 	//release the bitmap data
@@ -260,7 +293,7 @@ void VBTerrain::normaliseHeightmap()
 	{
 		for (int j = 0; j < m_height; j++)
 		{
-			m_heightmap[(m_height * i) + j].Pos.y /= 5.0f;
+			m_heightmap[(m_height * i) + j] /= 10.0f;
 		}
 	}
 }
