@@ -17,6 +17,7 @@ struct myVertex
 	Vector3 Norm;
 	Color Color;
 	Vector2 texCoord;
+	Vector2 perlinVec;
 };
 
 const D3D11_INPUT_ELEMENT_DESC myVertexLayout[] =
@@ -25,6 +26,7 @@ const D3D11_INPUT_ELEMENT_DESC myVertexLayout[] =
 	{ "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	{ "perlinVec",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 56, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 };
 
 #endif

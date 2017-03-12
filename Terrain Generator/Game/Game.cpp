@@ -112,9 +112,10 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 
 	//Add terrain from the terrain generator
 	VBTerrain* terrain = new VBTerrain();
-	terrain->init(11, _pd3dDevice);
+	terrain->initWithHeightMap(_pd3dDevice, "../Assets/HeightMaps/testMap.bmp");
 	terrain->SetScale(1.0f, 1.0f, 1.0f);
 	terrain->SetPos(Vector3(0.0f, 0.0f, 0.0f));
+	terrain->writeToBmp("testwrite.bmp");
 	m_GameObjects.push_back(terrain);
 
 	////add random content to show the various what you've got here
