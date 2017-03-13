@@ -3,6 +3,7 @@
 #include "Helper.h"
 #include <iostream>
 #include <random>
+#include <math.h>
 
 void VBTerrain::init(ID3D11Device* GD)
 {
@@ -288,7 +289,7 @@ bool VBTerrain::readFromBmp(char* _filename)
 
 	int index;
 
-	//read the iamge data into the heightmap
+	//read the image data into the heightmap
 	for (int i = 0; i < m_width; i++)
 	{
 		for (int j = 0; j < m_height; j++)
@@ -319,7 +320,7 @@ bool VBTerrain::readFromBmp(char* _filename)
 
 bool VBTerrain::writeToBmp(std::string _filename)
 {
-	FILE* filePtr = nullptr;
+	FILE* filePtr;
 	BITMAPFILEHEADER fileHeader;
 	BITMAPINFOHEADER infoHeader;
 	std::string fileName = "../Assets/HeightMaps/" + _filename;
@@ -339,7 +340,7 @@ bool VBTerrain::writeToBmp(std::string _filename)
 	fileHeader.bfSize = 54 + (( 3 * m_width + padding) * m_height);
 	
 	infoHeader.biBitCount = 24;
-	infoHeader.biCompression = 0;
+	infoHeader.biCompression = BI_RGB;
 	infoHeader.biSize = 40;
 	infoHeader.biClrImportant = 0;
 	infoHeader.biClrUsed = 0;
@@ -352,8 +353,8 @@ bool VBTerrain::writeToBmp(std::string _filename)
 
 	image = new unsigned char[infoHeader.biSizeImage];
 	float greyscaleValue = 0;
-	int index = 0;
-	for (int i = 0; i < m_height - 1; i++)
+	long index = 0;
+	for (int i = 0; i < m_height; i++)
 	{
 		for (int j = 0; j < m_width - 1; j++)
 		{
@@ -394,8 +395,8 @@ bool VBTerrain::writeToBmp(std::string _filename)
 		return false;
 	}
 
-	//write in pixel values
-	fwrite(image, sizeof(DWORD), m_width * m_height, filePtr);
+	//write in the pixel values
+	fwrite(image, sizeof(DWORD), infoHeader.biSizeImage, filePtr);
 
 	//close the file
 	error = fclose(filePtr);
@@ -416,60 +417,63 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 {
 	m_width = _size;
 	m_height = _size;
+
+	//initialise the gradient arrays used in Perlin noise
+	for (int i = 0; i < 256; i++)
+	{
+		gradsX[i] = float(rand()) / (RAND_MAX / 2) - 1.0f;
+		gradsY[i] = float(rand()) / (RAND_MAX / 2) - 1.0f;
+	}
 }
 
-//This algorithm is mostly taken from Perlin's own implementation http://mrl.nyu.edu/~perlin/noise/ 
-double VBTerrain::generatePerlin(double x, double y, double z)
+//This algorithm is a combination of these two tutorials:
+//http://www.angelcode.com/dev/perlin/perlin.html
+//http://flafla2.github.io/2014/08/09/perlinnoise.html
+double VBTerrain::generatePerlin(double x, double y)
 {
-	//create the unit cube that our coordinate is in
-	int X = (int)floor(x) & 255;
-	int Y = (int)floor(y) & 255;
-	int Z = (int)floor(z) & 255;
+	////calculate where the square the input falls into is
+	//int cellX1 = (int)floorf(x);
+	//int cellX2 = cellX1 + 1;
 
-	//find relative x, y, z of point in the cube
-	x -= floor(x);
-	y -= floor(y);
-	z -= floor(z);
+	//int cellY1 = (int)floorf(y);
+	//int cellY2 = cellY1 + 1;
 
-	//compute the fade curves for each value
-	double u = fade(x);
-	double v = fade(y);
-	double w = fade(z);
+	////permutate values to get indices to use with the gradient look-up tables
+	//int indexAA = permutations[(cellY1 + permutations[cellX1 % 256]) % 256];
+	//int indexAB = permutations[(cellY1 + permutations[cellX2 % 256]) % 256];
 
-	//hash coordinates of the 8 cube corners
-	int AAA, ABA, AAB, ABB, BAA, BBA, BAB, BBB;
-	AAA = m_p[m_p[m_p[X] + Y] + Z];
-	ABA = m_p[m_p[m_p[X] + Y + 1] + Z];
-	AAB = m_p[m_p[m_p[X] + Y] + Z + 1];
-	ABB = m_p[m_p[m_p[X] + Y + 1] + Z + 1];
-	BAA = m_p[m_p[m_p[X + 1] + Y] + Z];
-	BBA = m_p[m_p[m_p[X + 1] + Y + 1] + Z];
-	BAB = m_p[m_p[m_p[X + 1] + Y] + Z + 1];
-	BBB = m_p[m_p[m_p[X + 1] + Y + 1] + Z + 1];
+	//int indexBA = permutations[(cellY2 + permutations[cellX1 % 256]) % 256];
+	//int indexBB = permutations[(cellY2 + permutations[cellX2 % 256]) % 256];
 
-	//apply the gradient function and interpolate
-	double x1, x2, y1, y2;
-	x1 = lerp(gradient(AAA, x, y, z),
-		gradient(BAA, x - 1, y, z),
-		u);
+	////calculate the vectors from the four cell points to the input point
+	//double distX1 = x - floorf(x);
+	//double distX2 = distX1 - 1;
+	//
+	//double distY1 = y - floorf(y);
+	//double distY2 = distY1 - 1;
 
-	x2 = lerp(gradient(ABA, x, y - 1, z),
-		gradient(BAA, x - 1, y - 1, z),
-		u);
+	////calculate the dot-products between the vectors and the gradients
+	//double vecAA = gradsX[indexAA] * distX1 + gradsY[indexAA] * distY1;
+	//double vecAB = gradsX[indexAB] * distX2 + gradsY[indexAB] * distY2;
 
-	y1 = lerp(x1, x2, v);
+	//double vecBA = gradsX[indexBA] * distX1 + gradsY[indexBA] * distY1;
+	//double vecBB = gradsX[indexBB] * distX2 + gradsY[indexBB] * distY2;
 
-	x1 = lerp(gradient(AAB, x, y, z - 1),
-		gradient(BAB, x - 1, y, z - 1),
-		u);
+	////compute the fade curves for each value
+	//double u = fade(x);
+	//double v = fade(y);
 
-	x2 = lerp(gradient(ABB, x, y - 1, z - 1),
-		gradient(BBB, x - 1, y - 1, z - 1),
-		u);
+	////interpolate the resulting dot products
+	//double x1, x2, result;
 
-	y2 = lerp(x1, x2, v);
+	//x1 = lerp(vecAA, vecAB, u);
+	//x2 = lerp(vecBA, vecBB, u);
 
-	return (lerp(y1, y2, w) + 1) / 2;
+	//result = (lerp(x1, x2, v) + 1) / 2;
+	//
+	//std::cout << result << std::endl;
+	double result = 0;
+	return result;
 }
 
 double VBTerrain::fade(double t)

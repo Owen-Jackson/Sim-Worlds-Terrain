@@ -115,8 +115,13 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	terrain->initWithHeightMap(_pd3dDevice, "../Assets/HeightMaps/testMap.bmp");
 	terrain->SetScale(1.0f, 1.0f, 1.0f);
 	terrain->SetPos(Vector3(0.0f, 0.0f, 0.0f));
-	terrain->writeToBmp("testwrite.bmp");
 	m_GameObjects.push_back(terrain);
+
+	VBTerrain* perlin = new VBTerrain();
+	perlin->initWithPerlin(300, _pd3dDevice);
+	//perlin->generatePerlin(0.3, 0.74);
+	perlin->writeToBmp("testwrite.bmp");
+	m_GameObjects.push_back(perlin);
 
 	////add random content to show the various what you've got here
 	//Terrain* terrain = new Terrain("table.cmo", _pd3dDevice, m_fxFactory, Vector3(100.0f, 0.0f, 100.0f), 0.0f, 0.0f, 0.0f, 0.25f * Vector3::One);

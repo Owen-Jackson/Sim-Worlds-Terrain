@@ -29,7 +29,7 @@ public:
 
 	//Perlin related functions
 	void initWithPerlin(int size, ID3D11Device* _GD);
-	double generatePerlin(double x, double y, double z);
+	double generatePerlin(double x, double y);
 	double fade(double t);
 	double gradient(int hash, double x, double y, double z);
 	double lerp(double a, double b, double x);
@@ -44,18 +44,13 @@ protected:
 	WORD* m_indices;
 	myVertex* m_vertices;
 	int* m_heightmap;
-	int m_width = 200;
-	int m_height = 200;
+	int m_width = 1024;
+	int m_height = 1024;
 
 	//Perlin variables
-	//array to store the pre-defined gradient vectors
-	int gradientVectors[16]
-	{
-		(1, 1, 0),(-1, 1, 0),(1, -1, 0),(-1, -1, 0),
-		(1, 0, 1),(-1, 0, 1),(1, 0, -1),(-1, 0, -1),
-		(0, 1, 1),(0, -1, 1),(0, 1, -1),(0, -1, -1),
-		(1, 1, 0),(-1, 1, 0),(0, -1, 1),(0, -1, 1)	//padding to avoid cost of dividing by 12
-	};
+	//arrays to store the gradient vectors
+	float gradsX[256];
+	float gradsY[256];
 
 	//Permutations from Perlin's own implementation http://mrl.nyu.edu/~perlin/noise/
 	int permutations[256] = {
@@ -73,8 +68,6 @@ protected:
 		49,192,214, 31,181,199,106,157,184, 84,204,176,115,121,50,45,127, 4,150,254,
 		138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180
 	};
-
-	int* m_p;
 
 };
 
