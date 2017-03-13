@@ -12,7 +12,7 @@
 #include "drawdata.h"
 #include "DrawData2D.h"
 
-#include <AntTweakBar.h>
+//#include <AntTweakBar.h>
 #include <iostream>
 
 using namespace DirectX;
@@ -118,9 +118,10 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	m_GameObjects.push_back(terrain);
 
 	VBTerrain* perlin = new VBTerrain();
-	perlin->initWithPerlin(300, _pd3dDevice);
+	perlin->initWithPerlin(1024, _pd3dDevice);
 	//perlin->generatePerlin(0.3, 0.74);
 	perlin->writeToBmp("testwrite.bmp");
+	perlin->generatePerlin(2.3, 6.1);
 	m_GameObjects.push_back(perlin);
 
 	////add random content to show the various what you've got here

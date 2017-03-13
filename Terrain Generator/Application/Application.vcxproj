@@ -140,7 +140,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions> %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dinput8.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies);game.lib;DirectXTK.lib;DirectXTKAudioWin8.lib</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dinput8.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies);game.lib;DirectXTK.lib;DirectXTKAudioWin8.lib;</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LargeAddressAware>true</LargeAddressAware>

@@ -31,7 +31,6 @@ public:
 	void initWithPerlin(int size, ID3D11Device* _GD);
 	double generatePerlin(double x, double y);
 	double fade(double t);
-	double gradient(int hash, double x, double y, double z);
 	double lerp(double a, double b, double x);
 
 protected:

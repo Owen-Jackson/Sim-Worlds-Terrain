@@ -218,21 +218,22 @@ bool VBTerrain::readFromBmp(char* _filename)
 		return false;
 	}
 
-	std::cout << "\nbfOffbits: " << bitmapFileHeader.bfOffBits
-		<< "\nbfSize: " << bitmapFileHeader.bfSize
-		<< "\nbfType: " << bitmapFileHeader.bfType
-		<< "\nbiBitCount: " << bitmapInfoHeader.biBitCount
-		<< "\nbiClrImportant: " <<bitmapInfoHeader.biClrImportant
-		<< "\nbiClrUsed: " << bitmapInfoHeader.biClrUsed
-		<< "\nbiCompression: " << bitmapInfoHeader.biCompression
-		<< "\nbiHeight: " << bitmapInfoHeader.biHeight
-		<< "\nbiPlanes: " << bitmapInfoHeader.biPlanes
-		<< "\nbiSize: " << bitmapInfoHeader.biSize
-		<< "\nbiSizeImage: " << bitmapInfoHeader.biSizeImage
-		<< "\nbiWidth: " << bitmapInfoHeader.biWidth
-		<< "\nbiXPelsPerMeter: " << bitmapInfoHeader.biXPelsPerMeter
-		<< "\nbiYPelsPerMeter: " << bitmapInfoHeader.biYPelsPerMeter
-		<< std::endl;
+	//Output the data from the loaded file (used to reverse engineer my write to bitmap function)
+	//std::cout << "\nbfOffbits: " << bitmapFileHeader.bfOffBits
+	//	<< "\nbfSize: " << bitmapFileHeader.bfSize
+	//	<< "\nbfType: " << bitmapFileHeader.bfType
+	//	<< "\nbiBitCount: " << bitmapInfoHeader.biBitCount
+	//	<< "\nbiClrImportant: " <<bitmapInfoHeader.biClrImportant
+	//	<< "\nbiClrUsed: " << bitmapInfoHeader.biClrUsed
+	//	<< "\nbiCompression: " << bitmapInfoHeader.biCompression
+	//	<< "\nbiHeight: " << bitmapInfoHeader.biHeight
+	//	<< "\nbiPlanes: " << bitmapInfoHeader.biPlanes
+	//	<< "\nbiSize: " << bitmapInfoHeader.biSize
+	//	<< "\nbiSizeImage: " << bitmapInfoHeader.biSizeImage
+	//	<< "\nbiWidth: " << bitmapInfoHeader.biWidth
+	//	<< "\nbiXPelsPerMeter: " << bitmapInfoHeader.biXPelsPerMeter
+	//	<< "\nbiYPelsPerMeter: " << bitmapInfoHeader.biYPelsPerMeter
+	//	<< std::endl;
 
 	//get the dimensions of the terrain
 	m_width = bitmapInfoHeader.biWidth;
@@ -333,14 +334,14 @@ bool VBTerrain::writeToBmp(std::string _filename)
 	}
 
 	//set file header and info header variables
-	fileHeader.bfType = 19778;
+	fileHeader.bfType = 'MB';
 	fileHeader.bfOffBits = 54;
 	fileHeader.bfReserved1 = 0;
 	fileHeader.bfReserved2 = 0;
 	fileHeader.bfSize = 54 + (( 3 * m_width + padding) * m_height);
 	
 	infoHeader.biBitCount = 24;
-	infoHeader.biCompression = BI_RGB;
+	infoHeader.biCompression = 0;
 	infoHeader.biSize = 40;
 	infoHeader.biClrImportant = 0;
 	infoHeader.biClrUsed = 0;
@@ -352,13 +353,19 @@ bool VBTerrain::writeToBmp(std::string _filename)
 	infoHeader.biWidth = m_width;
 
 	image = new unsigned char[infoHeader.biSizeImage];
-	float greyscaleValue = 0;
+	double greyscaleValue = 0;
+	double x = 0, y = 0;
 	long index = 0;
+	double min = 0;
 	for (int i = 0; i < m_height; i++)
 	{
 		for (int j = 0; j < m_width - 1; j++)
 		{
-			greyscaleValue = rand() % 255 + 0;
+			x = 1/((double)j / (double)m_width);
+			y = 1/((double)i / (double)m_height);
+
+			greyscaleValue = generatePerlin(x, y) * 256;
+			//std::cout << greyscaleValue << std::endl;
 			image[index++] = (float)greyscaleValue;
 			image[index++] = (float)greyscaleValue;
 			image[index++] = (float)greyscaleValue;
@@ -396,7 +403,7 @@ bool VBTerrain::writeToBmp(std::string _filename)
 	}
 
 	//write in the pixel values
-	fwrite(image, sizeof(DWORD), infoHeader.biSizeImage, filePtr);
+	fwrite(image, sizeof(BYTE), infoHeader.biSizeImage, filePtr);
 
 	//close the file
 	error = fclose(filePtr);
@@ -431,48 +438,48 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 //http://flafla2.github.io/2014/08/09/perlinnoise.html
 double VBTerrain::generatePerlin(double x, double y)
 {
-	////calculate where the square the input falls into is
-	//int cellX1 = (int)floorf(x);
-	//int cellX2 = cellX1 + 1;
+	//calculate where the square the input falls into is located
+	int x0 = (int)floorf(x);
+	int x1 = x0 + 1;
 
-	//int cellY1 = (int)floorf(y);
-	//int cellY2 = cellY1 + 1;
+	int y0 = (int)floorf(y);
+	int y1 = y0 + 1;
 
-	////permutate values to get indices to use with the gradient look-up tables
-	//int indexAA = permutations[(cellY1 + permutations[cellX1 % 256]) % 256];
-	//int indexAB = permutations[(cellY1 + permutations[cellX2 % 256]) % 256];
+	//calculate input point's position within the unit square
+	float pX0 = x - floorf(x);
+	float pX1 = pX0 - 1;
 
-	//int indexBA = permutations[(cellY2 + permutations[cellX1 % 256]) % 256];
-	//int indexBB = permutations[(cellY2 + permutations[cellX2 % 256]) % 256];
+	float pY0 = y - floorf(y);
+	float pY1 = pY0 - 1;
 
-	////calculate the vectors from the four cell points to the input point
-	//double distX1 = x - floorf(x);
-	//double distX2 = distX1 - 1;
-	//
-	//double distY1 = y - floorf(y);
-	//double distY2 = distY1 - 1;
+	//permutate values to get indices to use with the gradient look-up tables
+	//then get the dot product between the gradient and sample position vector
+	int index = permutations[(x0 + permutations[y0 & 255]) & 255];
+	double vecAA = gradsX[index] * pX0 + gradsY[index] * pY0;
 
-	////calculate the dot-products between the vectors and the gradients
-	//double vecAA = gradsX[indexAA] * distX1 + gradsY[indexAA] * distY1;
-	//double vecAB = gradsX[indexAB] * distX2 + gradsY[indexAB] * distY2;
+	index = permutations[(x1 + permutations[y0 & 255]) & 255];
+	double vecAB = gradsX[index] * pX1 + gradsY[index] * pY1;
 
-	//double vecBA = gradsX[indexBA] * distX1 + gradsY[indexBA] * distY1;
-	//double vecBB = gradsX[indexBB] * distX2 + gradsY[indexBB] * distY2;
+	index = permutations[(x0 + permutations[y1 & 255]) & 255];
+	double vecBA = gradsX[index] * pX0 + gradsY[index] * pY0;
 
-	////compute the fade curves for each value
-	//double u = fade(x);
-	//double v = fade(y);
+	index = permutations[(x1 + permutations[y1 & 255]) & 255];
+	double vecBB = gradsX[index] * pX1 + gradsY[index] * pY1;
 
-	////interpolate the resulting dot products
-	//double x1, x2, result;
+	//compute the fade curves for each value
+	double u = fade(x);
+	double v = fade(y);
 
-	//x1 = lerp(vecAA, vecAB, u);
-	//x2 = lerp(vecBA, vecBB, u);
+	//interpolate the resulting dot products
+	double r1, r2, result;
 
-	//result = (lerp(x1, x2, v) + 1) / 2;
-	//
+	r1 = lerp(vecAA, vecAB, u);
+	r2 = lerp(vecBA, vecBB, u);
+
+	result = (lerp(r1, r2, v)+1)/2;
+	
 	//std::cout << result << std::endl;
-	double result = 0;
+	
 	return result;
 }
 
@@ -481,32 +488,8 @@ double VBTerrain::fade(double t)
 	return t * t * t * (t * (t * 6 - 15) + 10);	//Ken Perlin's improved function
 }
 
-double VBTerrain::gradient(int _hash, double x, double y, double z)
-{
-	switch (_hash & 0xF)
-	{
-	case 0x0: return x + y;
-	case 0x1: return -x + y;
-	case 0x2: return x - y;
-	case 0x3: return -x - y;
-	case 0x4: return x + z;
-	case 0x5: return -x + z;
-	case 0x6: return  x - z;
-	case 0x7: return -x - z;
-	case 0x8: return  y + z;
-	case 0x9: return -y + z;
-	case 0xA: return  y - z;
-	case 0xB: return -y - z;
-	case 0xC: return  y + x;
-	case 0xD: return -y + z;
-	case 0xE: return  y - x;
-	case 0xF: return -y - z;
-	default: return 0; // never happens
-	}
-}
-
 //linearly interpolates the two points by a weight factor
-double VBTerrain::lerp(double a, double b, double x)
+double VBTerrain::lerp(double a, double b, double weight)
 {
-	return a + x * (b - a);
+	return a + weight * (b - a);
 }
