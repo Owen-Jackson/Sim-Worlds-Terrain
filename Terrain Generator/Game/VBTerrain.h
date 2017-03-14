@@ -39,17 +39,23 @@ protected:
 	int m_chunkNum;
 	int m_verticesPerChunk = 10000;
 	int m_numVerts = 0;
+	struct HeightMap
+	{
+		double height;
+		double gradx;
+		double grady;
+	};
 
 	WORD* m_indices;
 	myVertex* m_vertices;
-	int* m_heightmap;
+	HeightMap* m_heightmap;
 	int m_width = 1024;
 	int m_height = 1024;
 
 	//Perlin variables
 	//arrays to store the gradient vectors
-	float gradsX[256];
-	float gradsY[256];
+	double gradsX[256];
+	double gradsY[256];
 
 	//Permutations from Perlin's own implementation http://mrl.nyu.edu/~perlin/noise/
 	int permutations[256] = {

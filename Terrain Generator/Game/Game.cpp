@@ -88,7 +88,7 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	m_GameObjects.push_back(m_cam);
 
 	//create a base light
-	m_light = new Light(Vector3(0.0f, 100.0f, 160.0f), Color(1.0f, 1.0f, 1.0f, 1.0f), Color(0.4f, 0.1f, 0.1f, 1.0f));
+	m_light = new Light(Vector3(0.0f, 100.0f, 160.0f), Color(1.0f, 1.0f, 1.0f, 1.0f), Color(0.1f, 0.1f, 0.1f, 1.0f));
 	m_GameObjects.push_back(m_light);
 
 	//add Player
@@ -112,17 +112,19 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 
 	//Add terrain from the terrain generator
 	VBTerrain* terrain = new VBTerrain();
-	terrain->initWithHeightMap(_pd3dDevice, "../Assets/HeightMaps/testMap.bmp");
+	terrain->initWithHeightMap(_pd3dDevice, "../Assets/HeightMaps/Australia.bmp");
+	terrain->writeToBmp("testwrite.bmp");
+	terrain->buildMesh(_pd3dDevice);
 	terrain->SetScale(1.0f, 1.0f, 1.0f);
 	terrain->SetPos(Vector3(0.0f, 0.0f, 0.0f));
 	m_GameObjects.push_back(terrain);
 
-	VBTerrain* perlin = new VBTerrain();
-	perlin->initWithPerlin(1024, _pd3dDevice);
-	//perlin->generatePerlin(0.3, 0.74);
-	perlin->writeToBmp("testwrite.bmp");
-	perlin->generatePerlin(2.3, 6.1);
-	m_GameObjects.push_back(perlin);
+	//VBTerrain* perlin = new VBTerrain();
+	//perlin->initWithPerlin(1024, _pd3dDevice);
+	//perlin->writeToBmp("testwrite.bmp");
+	//perlin->buildMesh(_pd3dDevice);
+	//perlin->SetPos(Vector3(0.0f, 0.0f, 0.0f));
+	//m_GameObjects.push_back(perlin);
 
 	////add random content to show the various what you've got here
 	//Terrain* terrain = new Terrain("table.cmo", _pd3dDevice, m_fxFactory, Vector3(100.0f, 0.0f, 100.0f), 0.0f, 0.0f, 0.0f, 0.25f * Vector3::One);
