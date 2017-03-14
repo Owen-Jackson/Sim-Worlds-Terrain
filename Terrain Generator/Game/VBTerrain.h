@@ -14,7 +14,7 @@ class VBTerrain : public VBGO
 {
 public:
 	VBTerrain() {};
-	virtual ~VBTerrain() {};
+	virtual ~VBTerrain() { delete[] m_heightmap; };
 
 	//initialise the Veretx and Index buffers for the cube
 	void init(ID3D11Device* _GD);
@@ -32,6 +32,7 @@ public:
 	double generatePerlin(double x, double y);
 	double fade(double t);
 	double lerp(double a, double b, double x);
+	double grad(int hash, double x, double y);
 
 protected:
 	virtual void raiseTerrain();
@@ -67,7 +68,7 @@ protected:
 		49,192,214, 31,181,199,106,157,184, 84,204,176,115,121,50,45,127, 4,150,254,
 		138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180
 	};
-
+	int m_perms[512];
 };
 
 #endif

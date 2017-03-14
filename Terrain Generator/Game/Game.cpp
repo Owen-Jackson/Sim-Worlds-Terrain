@@ -112,7 +112,7 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 
 	//Add terrain from the terrain generator
 	VBTerrain* terrain = new VBTerrain();
-	terrain->initWithHeightMap(_pd3dDevice, "../Assets/HeightMaps/testMap.bmp");
+	terrain->initWithHeightMap(_pd3dDevice, "../Assets/HeightMaps/Wood.bmp");
 	terrain->SetScale(1.0f, 1.0f, 1.0f);
 	terrain->SetPos(Vector3(0.0f, 0.0f, 0.0f));
 	m_GameObjects.push_back(terrain);
@@ -121,7 +121,6 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	perlin->initWithPerlin(1024, _pd3dDevice);
 	//perlin->generatePerlin(0.3, 0.74);
 	perlin->writeToBmp("testwrite.bmp");
-	perlin->generatePerlin(2.3, 6.1);
 	m_GameObjects.push_back(perlin);
 
 	////add random content to show the various what you've got here

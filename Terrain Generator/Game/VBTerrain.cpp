@@ -353,7 +353,7 @@ bool VBTerrain::writeToBmp(std::string _filename)
 	infoHeader.biWidth = m_width;
 
 	image = new unsigned char[infoHeader.biSizeImage];
-	double greyscaleValue = 0;
+	int greyscaleValue = 0;
 	double x = 0, y = 0;
 	long index = 0;
 	double min = 0;
@@ -361,10 +361,11 @@ bool VBTerrain::writeToBmp(std::string _filename)
 	{
 		for (int j = 0; j < m_width - 1; j++)
 		{
-			x = 1/((double)j / (double)m_width);
-			y = 1/((double)i / (double)m_height);
+			x = (double)j/m_width;
+			y = (double)i/m_height;
+			//std::cout << x << " , " << y << std::endl;
 
-			greyscaleValue = generatePerlin(x, y) * 256;
+			greyscaleValue = (int)(generatePerlin(x, y) * 255);
 			//std::cout << greyscaleValue << std::endl;
 			image[index++] = (float)greyscaleValue;
 			image[index++] = (float)greyscaleValue;
@@ -428,8 +429,14 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 	//initialise the gradient arrays used in Perlin noise
 	for (int i = 0; i < 256; i++)
 	{
-		gradsX[i] = float(rand()) / (RAND_MAX / 2) - 1.0f;
-		gradsY[i] = float(rand()) / (RAND_MAX / 2) - 1.0f;
+		gradsX[i] = (float(rand()) / (RAND_MAX / 2)) - 1.0f;
+		gradsY[i] = (float(rand()) / (RAND_MAX / 2)) - 1.0f;
+	}
+
+	for (int i = 0; i < 256; i++)
+	{
+		m_perms[i] = permutations[i];
+		m_perms[256 + i] = permutations[i];
 	}
 }
 
@@ -439,57 +446,79 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 double VBTerrain::generatePerlin(double x, double y)
 {
 	//calculate where the square the input falls into is located
-	int x0 = (int)floorf(x);
-	int x1 = x0 + 1;
+	int xi = (int)floorf(x) & 255;
+	int yi = (int)floorf(y) & 255;
 
-	int y0 = (int)floorf(y);
-	int y1 = y0 + 1;
+	int grad1 = m_perms[m_perms[xi] + yi];
+	int grad2 = m_perms[m_perms[xi + 1] + yi];
+	int grad3 = m_perms[m_perms[xi] + yi + 1];
+	int grad4 = m_perms[m_perms[xi + 1] + yi + 1];
+
+	double xf = x - floor(x);
+	double yf = y - floor(y);
+
+	double d1 = grad(grad1, xf, yf);
+	double d2 = grad(grad2, xf - 1, yf);
+	double d3 = grad(grad3, xf, yf - 1);
+	double d4 = grad(grad4, xf - 1, yf - 1);
 
 	//calculate input point's position within the unit square
-	float pX0 = x - floorf(x);
-	float pX1 = pX0 - 1;
+	//float pX0 = x - floorf(x);
+	//float pX1 = pX0 - 1;
 
-	float pY0 = y - floorf(y);
-	float pY1 = pY0 - 1;
+	//float pY0 = y - floorf(y);
+	//float pY1 = pY0 - 1;
 
 	//permutate values to get indices to use with the gradient look-up tables
 	//then get the dot product between the gradient and sample position vector
-	int index = permutations[(x0 + permutations[y0 & 255]) & 255];
+	/*int index = m_perms[(x0 + m_perms[y0 & 255]) & 255];
 	double vecAA = gradsX[index] * pX0 + gradsY[index] * pY0;
 
-	index = permutations[(x1 + permutations[y0 & 255]) & 255];
-	double vecAB = gradsX[index] * pX1 + gradsY[index] * pY1;
+	index = m_perms[(x1 + m_perms[y0 & 255]) & 255];
+	double vecAB = gradsX[index] * pX1 + gradsY[index] * pY0;
 
-	index = permutations[(x0 + permutations[y1 & 255]) & 255];
-	double vecBA = gradsX[index] * pX0 + gradsY[index] * pY0;
+	index = m_perms[(x0 + m_perms[y1 & 255]) & 255];
+	double vecBA = gradsX[index] * pX0 + gradsY[index] * pY1;
 
-	index = permutations[(x1 + permutations[y1 & 255]) & 255];
-	double vecBB = gradsX[index] * pX1 + gradsY[index] * pY1;
+	index = m_perms[(x1 + m_perms[y1 & 255]) & 255];
+	double vecBB = gradsX[index] * pX1 + gradsY[index] * pY1;*/
 
 	//compute the fade curves for each value
-	double u = fade(x);
-	double v = fade(y);
+	double u = fade(xf);
+	double v = fade(yf);
 
 	//interpolate the resulting dot products
 	double r1, r2, result;
 
-	r1 = lerp(vecAA, vecAB, u);
-	r2 = lerp(vecBA, vecBB, u);
+	r1 = lerp(d1, d2, u);
+	r2 = lerp(d3, d4, u);
 
-	result = (lerp(r1, r2, v)+1)/2;
+	result = lerp(r1, r2, v);
 	
 	//std::cout << result << std::endl;
 	
-	return result;
+	return result;	//need to rescale from -1.0 - 1.0 to 0.0 - 1.0 
 }
 
 double VBTerrain::fade(double t)
 {
-	return t * t * t * (t * (t * 6 - 15) + 10);	//Ken Perlin's improved function
+	return t * t * t * (t * (t * 6 - 15) + 10);	//Ken Perlin's improved function: 6x^5 - 15x ^ 4 - 10x ^ 3
 }
 
 //linearly interpolates the two points by a weight factor
 double VBTerrain::lerp(double a, double b, double weight)
 {
 	return a + weight * (b - a);
+}
+
+double VBTerrain::grad(int hash, double x, double y)
+{
+	switch (hash & 3)
+	{
+	case 0: return x + y;
+	case 1: return -x + y;
+	case 2: return x - y;
+	case 3: return -x - y;
+	default: return 0;
+	}
 }
