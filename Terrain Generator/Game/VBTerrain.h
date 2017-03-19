@@ -14,7 +14,7 @@ class VBTerrain : public VBGO
 {
 public:
 	VBTerrain() {};
-	virtual ~VBTerrain() {};
+	virtual ~VBTerrain();
 
 	//initialise the Veretx and Index buffers for the cube
 	void init(ID3D11Device* _GD);
@@ -54,8 +54,9 @@ protected:
 
 	//Perlin variables
 	//arrays to store the gradient vectors
-	double gradsX[256];
-	double gradsY[256];
+	double* gradsX;
+	double* gradsY;
+	int* m_p;
 
 	//Permutations from Perlin's own implementation http://mrl.nyu.edu/~perlin/noise/
 	int permutations[256] = {
@@ -73,7 +74,6 @@ protected:
 		49,192,214, 31,181,199,106,157,184, 84,204,176,115,121,50,45,127, 4,150,254,
 		138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180
 	};
-
 };
 
 #endif

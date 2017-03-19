@@ -5,6 +5,14 @@
 #include <random>
 #include <math.h>
 
+VBTerrain::~VBTerrain()
+{
+	delete[] m_heightmap;
+	delete[] m_p;
+	delete[] gradsX;
+	delete[] gradsY;
+}
+
 void VBTerrain::init(ID3D11Device* GD)
 {
 	//calculate number of vertices and primitives
@@ -82,9 +90,6 @@ void VBTerrain::init(ID3D11Device* GD)
 			vert++;
 		}
 	}
-
-	//carry out some kind of transform on these vertices to make this object more interesting
-	//Transform();
 
 	//load texture
 	//HRESULT hr = CreateDDSTextureFromFile(GD, Helper::charToWChar("../Debug/Ground.dds"), nullptr, &m_pTextureRV);
@@ -403,16 +408,9 @@ bool VBTerrain::writeToBmp(std::string _filename)
 		return false;
 	}
 
-	std::cout << infoHeader.biSizeImage << std::endl;
+	//std::cout << infoHeader.biSizeImage << std::endl;
 	//write in the pixel values
-	error = fwrite(image, 1, infoHeader.biSizeImage, filePtr);
-	if (error != 1)
-	{
-		std::cout << "error: wrote to bitmap incorrectly\n";
-		std::cout << "bytes to write: " << infoHeader.biSizeImage << std::endl
-			<< "bytes written: " << index << std::endl;
-		return false;
-	}
+	fwrite(image, 1, infoHeader.biSizeImage, filePtr);
 
 	error = fclose(filePtr);
 	if (error != 0)
@@ -432,14 +430,20 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 {
 	m_width = _size;
 	m_height = _size;
-
+	m_p = new int[512];
+	for (int i = 0; i < 512; i++)
+	{
+		m_p[i] = permutations[i % 256];
+	}
 	m_heightmap = new HeightMap[m_width * m_height];
+	gradsX = new double[_size];
+	gradsY = new double[_size];
 	//initialise the gradient arrays used in Perlin noise
-	for (int i = 0; i < 255; i++)
+	for (int i = 0; i < _size; i++)
 	{
 		gradsX[i] = double(rand()) / (RAND_MAX / 2) - 1.0f;
 		gradsY[i] = double(rand()) / (RAND_MAX / 2) - 1.0f;
-		std::cout << gradsX[i] << " , " << gradsY[i] << std::endl;
+		//std::cout << gradsX[i] << " , " << gradsY[i] << std::endl;
 	}
 
 	int index = 0;
@@ -451,10 +455,10 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 			double x = (double)j / (double)m_width;
 			double y = (double)i / (double)m_height;
 			//std::cout << x << " , " << y << std::endl;
-			int random = rand() % 255;
+			int random = rand() % 256;
 			m_heightmap[index].gradx = gradsX[random];
 			m_heightmap[index].grady = gradsY[random];
-			m_heightmap[index].height = generatePerlin(x, y) * 255;
+			m_heightmap[index].height = generatePerlin(x, y) * 256;
 			//std::cout << m_heightmap[index].height << std::endl;
 		}
 	}
@@ -486,17 +490,17 @@ double VBTerrain::generatePerlin(double x, double y)
 
 	//permutate values to get indices to use with the gradient look-up tables
 	//then get the dot product between the gradient and sample position vector
-	int index = permutations[(x0 + permutations[y0 & 255]) & 255];
+	int index = m_p[(y0 + m_p[x0 % 256]) % 256];
 	//std::cout << index << std::endl;
 	double vecAA = gradsX[index] * pX0 + gradsY[index] * pY0;
 
-	index = permutations[(x1 + permutations[y0 & 255]) & 255];
-	double vecAB = gradsX[index] * pX1 + gradsY[index] * pY1;
+	index = m_p[(y0 + m_p[x1 % 256]) % 256];
+	double vecAB = gradsX[index] * pX1 + gradsY[index] * pY0;
 
-	index = permutations[(x0 + permutations[y1 & 255]) & 255];
-	double vecBA = gradsX[index] * pX0 + gradsY[index] * pY0;
+	index = m_p[(y1 + m_p[x0 % 256]) % 256];
+	double vecBA = gradsX[index] * pX0 + gradsY[index] * pY1;
 
-	index = permutations[(x1 + permutations[y1 & 255]) & 255];
+	index = m_p[(y1 + m_p[x1 % 256]) % 256];
 	double vecBB = gradsX[index] * pX1 + gradsY[index] * pY1;
 	//std::cout << vecAA << " , " << vecAB << " , " << vecBA << " , " << vecBB << std::endl;
 	
