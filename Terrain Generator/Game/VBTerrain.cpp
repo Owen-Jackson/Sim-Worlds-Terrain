@@ -152,7 +152,6 @@ void VBTerrain::raiseTerrain()
 
 			//4
 			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height + 1].height;
-
 			currentHeightMap++;
 		}
 		currentHeightMap++;
@@ -326,6 +325,8 @@ bool VBTerrain::writeToBmp(std::string _filename)
 	unsigned char* image;
 	int padding = 0;	//padding for end of each row if width is not multiple of 4
 
+	std::cout << "padding: " << m_width << " %  4 = " << m_width % 4 << std::endl;
+
 	if ((m_width * 3) % 4 != 0)
 	{
 		padding = 4 - ((m_width * 3) % 4);
@@ -334,7 +335,7 @@ bool VBTerrain::writeToBmp(std::string _filename)
 
 	//set file header and info header variables
 	fileHeader.bfType = 'MB';
-	fileHeader.bfSize = 54 + ((3 * m_width + padding) * m_height);
+	fileHeader.bfSize = 54 + ((3 * m_width) + padding) * m_height;
 	fileHeader.bfReserved1 = 0;
 	fileHeader.bfReserved2 = 0;
 	fileHeader.bfOffBits = 54;
@@ -344,41 +345,42 @@ bool VBTerrain::writeToBmp(std::string _filename)
 	infoHeader.biWidth = m_width;
 	infoHeader.biPlanes = 1;
 	infoHeader.biBitCount = 24;
-	infoHeader.biCompression = BI_RGB;
-	infoHeader.biSizeImage = 0;
+	infoHeader.biCompression = 0;
+	infoHeader.biSizeImage = ((3* m_width) + padding) * m_height;
 	infoHeader.biXPelsPerMeter = 3780;
 	infoHeader.biYPelsPerMeter = 3780;
 	infoHeader.biClrUsed = 0;
 	infoHeader.biClrImportant = 0;
 
 	image = new unsigned char[((3 * m_width + padding) * m_height)];
-	double greyscaleValue = 0;
+	double greyscaleValue;
 	long index = 0;
 	int ind = 0;
-	for (int i = 0; i < m_width; i++)
+	for (int i = 0; i < m_height; i++)
 	{
-		for (int j = 0; j < m_height; j++)
+		for (int j = 0; j < m_width; j++)
 		{
 			ind = (m_width * i) + j;
 			greyscaleValue = m_heightmap[ind].height * 255;
-			//std::cout << greyscaleValue << std::endl;
-			image[index++] = (float)greyscaleValue;
-			image[index++] = (float)greyscaleValue;
-			image[index++] = (float)greyscaleValue;
 
-			for (int k = 0; k < padding; k++)
-			{
-				image[index++] = (float) 0.0f;
-			}
+			image[index] = (float)greyscaleValue;
+			index++;
+			image[index] = (float)greyscaleValue;
+			index++;
+			image[index] = (float)greyscaleValue;
+			index++;
+		}
+		for (int k = 0; k < padding; k++)
+		{
+			std::cout << "adding padding" << std::endl;
+			image[index++] = (float) 0.0f;
 		}
 	}
 
 	int error = 0;
 
-	std::cout << index << " , " << infoHeader.biSizeImage << " (should be equal)" << std::endl;
-
 	//open a new file to write to
-	error = fopen_s(&filePtr, fileName.c_str(), "w");
+	error = fopen_s(&filePtr, fileName.c_str(), "wb");
 	if (error != 0)
 	{
 		std::cout << "error : could not open file to write to\n";
@@ -401,14 +403,17 @@ bool VBTerrain::writeToBmp(std::string _filename)
 		return false;
 	}
 
+	std::cout << infoHeader.biSizeImage << std::endl;
 	//write in the pixel values
-	fwrite(image, sizeof(BYTE), ((3 * m_width + padding) * m_height), filePtr);
-	//for (int i = 0; i < m_height; i++)
-	//{
-	//	fwrite(image + (m_width * (m_height - i - 1) * 3), 3, m_width, filePtr);
-	//}
+	error = fwrite(image, 1, infoHeader.biSizeImage, filePtr);
+	if (error != 1)
+	{
+		std::cout << "error: wrote to bitmap incorrectly\n";
+		std::cout << "bytes to write: " << infoHeader.biSizeImage << std::endl
+			<< "bytes written: " << index << std::endl;
+		return false;
+	}
 
-	//close the file
 	error = fclose(filePtr);
 	if (error != 0)
 	{
@@ -427,7 +432,6 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 {
 	m_width = _size;
 	m_height = _size;
-	init(GD);
 
 	m_heightmap = new HeightMap[m_width * m_height];
 	//initialise the gradient arrays used in Perlin noise
@@ -444,8 +448,8 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 		for (int j = 0; j < m_width; j++)
 		{
 			index = (m_width * j) + i;
-			double x = (double)j / m_width;
-			double y = (double)i / m_height;
+			double x = (double)j / (double)m_width;
+			double y = (double)i / (double)m_height;
 			//std::cout << x << " , " << y << std::endl;
 			int random = rand() % 255;
 			m_heightmap[index].gradx = gradsX[random];
@@ -454,7 +458,8 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 			//std::cout << m_heightmap[index].height << std::endl;
 		}
 	}
-	//normaliseHeightmap();
+	init(GD);
+	normaliseHeightmap();
 	raiseTerrain();
 	initialiseNormals();
 
@@ -494,6 +499,7 @@ double VBTerrain::generatePerlin(double x, double y)
 	index = permutations[(x1 + permutations[y1 & 255]) & 255];
 	double vecBB = gradsX[index] * pX1 + gradsY[index] * pY1;
 	//std::cout << vecAA << " , " << vecAB << " , " << vecBA << " , " << vecBB << std::endl;
+	
 	//compute the fade curves for each value
 	double u = fade(x);
 	double v = fade(y);
@@ -504,11 +510,11 @@ double VBTerrain::generatePerlin(double x, double y)
 	r1 = lerp(vecAA, vecAB, u);
 	r2 = lerp(vecBA, vecBB, u);
 
-	result = (lerp(r1, r2, v)+1)/2;
+	result = lerp(r1, r2, v);
 	
 	//std::cout << result << std::endl;
 	
-	return result;
+	return (result + 1)/2;
 }
 
 double VBTerrain::fade(double t)
