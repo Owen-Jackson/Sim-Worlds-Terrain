@@ -32,10 +32,9 @@ public:
 	double generatePerlin(double x, double y);
 	double fade(double t);
 	double lerp(double a, double b, double x);
+	void raiseTerrain();
 
 protected:
-	virtual void raiseTerrain();
-
 	int m_chunkNum;
 	int m_verticesPerChunk = 10000;
 	int m_numVerts = 0;

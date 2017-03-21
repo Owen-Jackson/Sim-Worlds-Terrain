@@ -112,8 +112,8 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 
 	//Add terrain from the terrain generator
 	//VBTerrain* terrain = new VBTerrain();
-	//terrain->initWithHeightMap(_pd3dDevice, "../Assets/HeightMaps/Australia.bmp");
-	//terrain->writeToBmp("testwrite.bmp");
+	//terrain->initWithHeightMap(_pd3dDevice, "../Assets/HeightMaps/TestMap.bmp");
+	////terrain->writeToBmp("testwrite.bmp");
 	//terrain->buildMesh(_pd3dDevice);
 	//terrain->SetScale(1.0f, 1.0f, 1.0f);
 	//terrain->SetPos(Vector3(0.0f, 0.0f, 0.0f));
@@ -123,6 +123,9 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	VBTerrain* perlin = new VBTerrain();
 	perlin->initWithPerlin(1024, _pd3dDevice);
 	perlin->writeToBmp("PerlinTestWrite.bmp");
+	perlin->readFromBmp("../Assets/HeightMaps/PerlinTestWrite.bmp");
+	perlin->raiseTerrain();
+	perlin->initialiseNormals();
 	perlin->buildMesh(_pd3dDevice);
 	perlin->SetPos(Vector3(0.0f, 0.0f, 0.0f));
 	m_GameObjects.push_back(perlin);

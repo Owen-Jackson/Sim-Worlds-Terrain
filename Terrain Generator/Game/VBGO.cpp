@@ -110,7 +110,7 @@ void VBGO::Draw(DrawData* _DD)
 	//note that if you do use this you'll need to change the stride and offset above
 	ID3D11InputLayout* useLayout = m_pVertexLayout ? m_pVertexLayout : s_pVertexLayout;
 	_DD->m_pd3dImmediateContext->IASetInputLayout(useLayout);
-
+	
 	//set Vertex Shader
 	ID3D11VertexShader* useVS = m_pVertexShader ? m_pVertexShader : s_pVertexShader;
 	_DD->m_pd3dImmediateContext->VSSetShader(useVS, NULL, 0);

@@ -422,6 +422,9 @@ bool VBTerrain::writeToBmp(std::string _filename)
 	delete[] image;
 	image = 0;
 
+	delete[] m_heightmap;
+	m_heightmap = nullptr;
+
 	return true;
 }
 
@@ -447,6 +450,7 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 	}
 
 	int index = 0;
+
 	for (int i = 0; i < m_height; i++)
 	{
 		for (int j = 0; j < m_width; j++)
@@ -464,8 +468,8 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 	}
 	init(GD);
 	normaliseHeightmap();
-	raiseTerrain();
-	initialiseNormals();
+	//raiseTerrain();
+	//initialiseNormals();
 
 }
 
@@ -490,17 +494,17 @@ double VBTerrain::generatePerlin(double x, double y)
 
 	//permutate values to get indices to use with the gradient look-up tables
 	//then get the dot product between the gradient and sample position vector
-	int index = m_p[(y0 + m_p[x0 % 256]) % 256];
+	int index = m_p[(y0 + m_p[x0])];
 	//std::cout << index << std::endl;
 	double vecAA = gradsX[index] * pX0 + gradsY[index] * pY0;
 
-	index = m_p[(y0 + m_p[x1 % 256]) % 256];
+	index = m_p[(y0 + m_p[x1])];
 	double vecAB = gradsX[index] * pX1 + gradsY[index] * pY0;
 
-	index = m_p[(y1 + m_p[x0 % 256]) % 256];
+	index = m_p[(y1 + m_p[x0])];
 	double vecBA = gradsX[index] * pX0 + gradsY[index] * pY1;
 
-	index = m_p[(y1 + m_p[x1 % 256]) % 256];
+	index = m_p[(y1 + m_p[x1])];
 	double vecBB = gradsX[index] * pX1 + gradsY[index] * pY1;
 	//std::cout << vecAA << " , " << vecAB << " , " << vecBA << " , " << vecBB << std::endl;
 	
