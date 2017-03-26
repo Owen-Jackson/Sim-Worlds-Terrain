@@ -112,11 +112,9 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 
 	//Add terrain from the terrain generator
 	//VBTerrain* terrain = new VBTerrain();
-	//terrain->initWithHeightMap(_pd3dDevice, "../Assets/HeightMaps/TestMap.bmp");
+	//terrain->initWithHeightMap(_pd3dDevice, "../Assets/HeightMaps/Australia.bmp");
 	////terrain->writeToBmp("testwrite.bmp");
 	//terrain->buildMesh(_pd3dDevice);
-	//terrain->SetScale(1.0f, 1.0f, 1.0f);
-	//terrain->SetPos(Vector3(0.0f, 0.0f, 0.0f));
 	//m_GameObjects.push_back(terrain);
 
 	//Testing perlin noise
@@ -124,67 +122,11 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	perlin->initWithPerlin(1024, _pd3dDevice);
 	perlin->writeToBmp("PerlinTestWrite.bmp");
 	perlin->readFromBmp("../Assets/HeightMaps/PerlinTestWrite.bmp");
+	perlin->normaliseHeightmap();
 	perlin->raiseTerrain();
 	perlin->initialiseNormals();
 	perlin->buildMesh(_pd3dDevice);
-	perlin->SetPos(Vector3(0.0f, 0.0f, 0.0f));
 	m_GameObjects.push_back(perlin);
-
-	////add random content to show the various what you've got here
-	//Terrain* terrain = new Terrain("table.cmo", _pd3dDevice, m_fxFactory, Vector3(100.0f, 0.0f, 100.0f), 0.0f, 0.0f, 0.0f, 0.25f * Vector3::One);
-	//m_GameObjects.push_back(terrain);
-
-	////add some stuff to show off
-
-	//FileVBGO* terrainBox = new FileVBGO("../Assets/terrainTex.txt", _pd3dDevice);
-	//m_GameObjects.push_back(terrainBox);
-
-	//FileVBGO* Box = new FileVBGO("../Assets/cube.txt", _pd3dDevice);
-	//m_GameObjects.push_back(Box);
-	//Box->SetPos(Vector3(0.0f, 0.0f, -100.0f));
-	//Box->SetPitch(XM_PIDIV4);
-	//Box->SetScale(20.0f);
-
-	////L-system like tree
-	//m_GameObjects.push_back(new Tree(4, 4, .6f, 10.0f *Vector3::Up, XM_PI/6.0f, "JEMINA vase -up.cmo", _pd3dDevice, m_fxFactory));
-
-	//VBCube* cube = new VBCube();
-	//cube->init(11, _pd3dDevice);
-	//cube->SetPos(Vector3(100.0f, 0.0f, 0.0f));
-	//cube->SetScale(4.0f);
-	//m_GameObjects.push_back(cube);
-
-	//VBSpike* spikes = new VBSpike();
-	//spikes->init(11, _pd3dDevice);
-	//spikes->SetPos(Vector3(0.0f, 0.0f, 100.0f));
-	//spikes->SetScale(4.0f);
-	//m_GameObjects.push_back(spikes);
-
-	//VBSpiral* spiral = new VBSpiral();
-	//spiral->init(11, _pd3dDevice);
-	//spiral->SetPos(Vector3(-100.0f, 0.0f, 0.0f));
-	//spiral->SetScale(4.0f);
-	//m_GameObjects.push_back(spiral);
-
-	//VBPillow* pillow = new VBPillow();
-	//pillow->init(11, _pd3dDevice);
-	//pillow->SetPos(Vector3(-100.0f, 0.0f, -100.0f));
-	//pillow->SetScale(4.0f);
-	//m_GameObjects.push_back(pillow);
-
-	//VBSnail* snail = new VBSnail(_pd3dDevice, "../Assets/baseline.txt", 150, 0.98f, 0.09f * XM_PI, 0.4f, Color(1.0f, 0.0f, 0.0f, 1.0f), Color(0.0f, 0.0f, 1.0f, 1.0f));
-	//snail->SetPos(Vector3(-100.0f, 0.0f, 100.0f));
-	//snail->SetScale(2.0f);
-	//m_GameObjects.push_back(snail);
-
-	////Marching Cubes
-	//VBMarchCubes* VBMC = new VBMarchCubes();
-	//VBMC->init(Vector3(-8.0f, -8.0f, -17.0f), Vector3(8.0f, 8.0f,23.0f), 60.0f*Vector3::One, 0.01, _pd3dDevice);
-	//VBMC->SetPos(Vector3(100,0,-100));
-	//VBMC->SetPitch(-XM_PIDIV2);
-	//VBMC->SetScale(Vector3(3, 3, 1.5));
-	//m_GameObjects.push_back(VBMC);
-
 
 	////example basic 2D stuff
 	//ImageGO2D* logo = new ImageGO2D("logo_small", _pd3dDevice);

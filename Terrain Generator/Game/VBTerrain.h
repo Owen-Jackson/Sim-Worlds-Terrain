@@ -48,6 +48,7 @@ protected:
 	WORD* m_indices;
 	myVertex* m_vertices;
 	HeightMap* m_heightmap;
+	float m_normaliseMultiple = 10.0f;
 	int m_width = 1024;
 	int m_height = 1024;
 

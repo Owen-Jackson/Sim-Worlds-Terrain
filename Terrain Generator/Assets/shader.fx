@@ -33,6 +33,7 @@ struct VS_INPUT
 	float4 Norm : NORMAL;
     float4 Color : COLOR;
 	float2 texCoord : TEXCOORD;
+	float normalise : HEIGHTMULTIPLIER;
 };
 
 struct PS_INPUT
@@ -42,6 +43,7 @@ struct PS_INPUT
 	float4 Norm : NORMAL;
     float4 Color : COLOR;
 	float2 texCoord : TEXCOORD;
+	float normalise : HEIGHTMULTIPLIER;
 };
 
 
@@ -61,6 +63,8 @@ PS_INPUT VS( VS_INPUT input )
     output.Color = input.Color;
 
 	output.texCoord = input.texCoord;
+
+	output.normalise = input.normalise;
     
     return output;
 }
@@ -72,34 +76,32 @@ PS_INPUT VS( VS_INPUT input )
 float4 PS( PS_INPUT input) : SV_Target
 {
 	float4 vertexCol = input.Color * myTexture.Sample( Sampler1, input.texCoord );
+	float posY = input.worldPos.y * input.normalise;
+	if (posY <= 255 && posY > 180)
+	{
+		vertexCol = float4(255.0f / 255, 255.0f / 255, 255.0f / 255, 1.0f);	//White
+	}
+	if (posY <= 180 && posY > 125)
+	{
+		vertexCol = float4(169.0f / 255, 169.0f / 255, 169.0f / 255, 1.0f);	//Dark Grey
+	}
+	if (posY <= 125 && posY > 100)
+	{
+		vertexCol = float4(205.0f / 255, 133.0f / 255, 63.0f / 255, 1.0f);	//Peru (canyon brown)
+	}
+	if (posY <= 100 && posY > 25)
+	{
+		vertexCol = float4(34.0f / 255, 139.0f / 255, 34.0f / 255, 1.0f);		//Forest Green
+	}
+	if (posY <= 25 && posY > 20)
+	{
+		vertexCol = float4(255.0f / 255, 165.0f / 255, 0.0f, 1.0f);		//Orange/Yellow (sand)
+	}
+	if (posY <= 20)
+	{
+		vertexCol = float4(0.0f, 0.0f, 204.0f / 255, 1.0f);		//Blue (water)
+	}
 
-	if (input.worldPos.y <= 255)
-	{
-		vertexCol = float4(245.0f, 245.0f, 245.0f, 1.0f);	//White
-	}
-	if (input.worldPos.y <= 210)
-	{
-		vertexCol = float4(169.0f, 169.0f, 169.0f, 1.0f);	//Dark Grey
-	}
-	if (input.worldPos.y <= 150)
-	{
-		vertexCol = float4(205.0f, 133.0f, 63.0f, 1.0f);	//Peru (canyon brown)
-	}
-	if (input.worldPos.y <= 100)
-	{
-		vertexCol = float4(34.0f, 139.0f, 34.0f, 1.0f);		//Forest Green
-	}
-	if (input.worldPos.y <= 30)
-	{
-		vertexCol = float4(255.0f, 165.0f, 0.0f, 1.0f);		//Orange (sand)
-	}
-	if (input.worldPos.y <= 20)
-	{
-		vertexCol = float4(0.0f, 0.0f, 204.0f, 1.0f);		//Blue (water)
-	}
-
-	//vertexCol += myTexture.Sample(Sampler2, input.texCoord);
-	//vertexCol = float4(255.0f, 1.0f, 1.0f, 1.0f) * input.worldPos.y / 10;
 	float3 lightDir = normalize( input.worldPos - lightPos );
 	float4 diffuse =  saturate(max( 0.0f, dot( lightDir, normalize(input.Norm )) ) * lightCol);	//Increase the number value to reduce the detail of the vertex faces
     return saturate( (diffuse + ambientCol) * vertexCol );
@@ -115,5 +117,3 @@ float4 PS2(PS_INPUT input) : SV_Target
 	return saturate((diffuse + ambientCol) * vertexCol);
 	return float4(1.0f, 0.0f, 0.0f, 1.0f);
 }
-
-//float4 lerp(float4)

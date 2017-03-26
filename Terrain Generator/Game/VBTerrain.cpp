@@ -38,6 +38,7 @@ void VBTerrain::init(ID3D11Device* GD)
 	{
 		m_indices[i] = i;
 		m_vertices[i].texCoord = Vector2::One;
+		m_vertices[i].normalise = 1;
 	}
 
 	//in each loop create the two traingles for the matching sub-square on each of the six faces
@@ -170,8 +171,13 @@ void VBTerrain::normaliseHeightmap()
 	{
 		for (int j = 0; j < m_height; j++)
 		{
-			m_heightmap[(m_height * i) + j].height /= 10.0f;
+			m_heightmap[(m_height * i) + j].height /= m_normaliseMultiple;
 		}
+	}
+
+	for (int index = 0; index < m_numVerts; index++)
+	{
+		m_vertices[index].normalise = m_normaliseMultiple;
 	}
 }
 
@@ -181,6 +187,7 @@ void VBTerrain::initWithHeightMap(ID3D11Device* GD, char* _filename)
 	readFromBmp(_filename);
 
 	init(GD);
+	normaliseHeightmap();
 	raiseTerrain();
 	initialiseNormals();
 }
@@ -311,8 +318,6 @@ bool VBTerrain::readFromBmp(char* _filename)
 			position++;
 		}
 	}
-
-	normaliseHeightmap();
 
 	//release the bitmap data
 	delete[] bitmapImage;
@@ -462,7 +467,7 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 			int random = rand() % 256;
 			m_heightmap[index].gradx = gradsX[random];
 			m_heightmap[index].grady = gradsY[random];
-			m_heightmap[index].height = generatePerlin(x, y) * 256;
+			m_heightmap[index].height = generatePerlin(x, y) * 255.0f;
 			//std::cout << m_heightmap[index].height << std::endl;
 		}
 	}
