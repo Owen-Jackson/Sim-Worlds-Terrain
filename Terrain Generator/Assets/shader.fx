@@ -77,29 +77,38 @@ float4 PS( PS_INPUT input) : SV_Target
 {
 	float4 vertexCol = input.Color * myTexture.Sample( Sampler1, input.texCoord );
 	float posY = input.worldPos.y * input.normalise;
+
+	//create colour constants
+	float4 SNOW = float4(255.0f / 255, 255.0f / 255, 255.0f / 255, 1.0f);
+	float4 MOUNTAIN = float4(169.0f / 255, 169.0f / 255, 169.0f / 255, 1.0f);
+	float4 CANYON = float4(205.0f / 255, 133.0f / 255, 63.0f / 255, 1.0f);
+	float4 GRASS = float4(34.0f / 255, 139.0f / 255, 34.0f / 255, 1.0f);
+	float4 SAND = float4(255.0f / 255, 165.0f / 255, 0.0f, 1.0f);
+	float4 WATER = float4(0.0f, 0.0f, 204.0f / 255, 1.0f);
+	float weight = 0;
+
 	if (posY <= 255 && posY > 180)
 	{
-		vertexCol = float4(255.0f / 255, 255.0f / 255, 255.0f / 255, 1.0f);	//White
+		vertexCol = SNOW;	//White
 	}
-	if (posY <= 180 && posY > 125)
+	if (posY <= 180 && posY > 80)
 	{
-		vertexCol = float4(169.0f / 255, 169.0f / 255, 169.0f / 255, 1.0f);	//Dark Grey
+		vertexCol = MOUNTAIN;	//Dark Grey
 	}
-	if (posY <= 125 && posY > 100)
+	if (posY <= 80 && posY > 25)
 	{
-		vertexCol = float4(205.0f / 255, 133.0f / 255, 63.0f / 255, 1.0f);	//Peru (canyon brown)
-	}
-	if (posY <= 100 && posY > 25)
-	{
-		vertexCol = float4(34.0f / 255, 139.0f / 255, 34.0f / 255, 1.0f);		//Forest Green
+		weight = (100 - 26) / posY;
+		vertexCol = GRASS;		//Forest Green
 	}
 	if (posY <= 25 && posY > 20)
 	{
-		vertexCol = float4(255.0f / 255, 165.0f / 255, 0.0f, 1.0f);		//Orange/Yellow (sand)
+		weight = (25 - 21) / posY;
+		vertexCol = SAND;
 	}
 	if (posY <= 20)
 	{
-		vertexCol = float4(0.0f, 0.0f, 204.0f / 255, 1.0f);		//Blue (water)
+		weight = (20 - 0) / posY;
+		vertexCol = WATER;
 	}
 
 	float3 lightDir = normalize( input.worldPos - lightPos );

@@ -1,6 +1,7 @@
 #include "VBTerrain.h"
 #include "DDSTextureLoader.h"
 #include "Helper.h"
+#include "Perlin.h"
 #include <iostream>
 #include <random>
 #include <math.h>
@@ -8,9 +9,6 @@
 VBTerrain::~VBTerrain()
 {
 	delete[] m_heightmap;
-	delete[] m_p;
-	delete[] gradsX;
-	delete[] gradsY;
 }
 
 void VBTerrain::init(ID3D11Device* GD)
@@ -136,9 +134,9 @@ void VBTerrain::raiseTerrain()
 	int vert = 0;
 	int currentHeightMap = 0;
 
-	for (int i = 0; i < m_width - 1; i++)
+	for (int i = 0; i < m_height - 1; i++)
 	{
-		for (int j = 0; j < m_height - 1; j++)
+		for (int j = 0; j < m_width - 1; j++)
 		{
 			//The comments below represent the vertex number in the current quad 
 			//1
@@ -148,16 +146,16 @@ void VBTerrain::raiseTerrain()
 			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + 1].height;
 
 			//3
-			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height].height;
+			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_width].height;
 			
 			//3
-			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height].height;
+			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_width].height;
 
 			//2
 			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + 1].height;
 
 			//4
-			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_height + 1].height;
+			m_vertices[vert++].Pos.y = m_heightmap[currentHeightMap + m_width + 1].height;
 			currentHeightMap++;
 		}
 		currentHeightMap++;
@@ -167,11 +165,11 @@ void VBTerrain::raiseTerrain()
 void VBTerrain::normaliseHeightmap()
 {
 	//loop through each height value and divide by a factor to lower the variance in height levels
-	for (int i = 0; i < m_width; i++)
+	for (int i = 0; i < m_height; i++)
 	{
-		for (int j = 0; j < m_height; j++)
+		for (int j = 0; j < m_width; j++)
 		{
-			m_heightmap[(m_height * i) + j].height /= m_normaliseMultiple;
+			m_heightmap[(m_width * i) + j].height /= m_normaliseMultiple;
 		}
 	}
 
@@ -300,9 +298,9 @@ bool VBTerrain::readFromBmp(char* _filename)
 	int index;
 
 	//read the image data into the heightmap
-	for (int i = 0; i < m_width; i++)
+	for (int i = 0; i < m_height; i++)
 	{
-		for (int j = 0; j < m_height; j++)
+		for (int j = 0; j < m_width; j++)
 		{
 			height = bitmapImage[position];
 
@@ -371,7 +369,7 @@ bool VBTerrain::writeToBmp(std::string _filename)
 		for (int j = 0; j < m_width; j++)
 		{
 			ind = (m_width * i) + j;
-			greyscaleValue = m_heightmap[ind].height * 255;
+			greyscaleValue = floor(m_heightmap[ind].height * 255);
 
 			image[index] = (float)greyscaleValue;
 			index++;
@@ -427,32 +425,30 @@ bool VBTerrain::writeToBmp(std::string _filename)
 	delete[] image;
 	image = 0;
 
-	delete[] m_heightmap;
-	m_heightmap = nullptr;
-
 	return true;
 }
 
 //Perlin functions
 void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 {
+	Perlin* perlin = new Perlin(rand() % 256);
 	m_width = _size;
 	m_height = _size;
-	m_p = new int[512];
-	for (int i = 0; i < 512; i++)
-	{
-		m_p[i] = permutations[i % 256];
-	}
+	//m_p = new int[512];
+	//for (int i = 0; i < 512; i++)
+	//{
+	//	m_p[i] = permutations[i % 256];
+	//}
 	m_heightmap = new HeightMap[m_width * m_height];
-	gradsX = new double[_size];
-	gradsY = new double[_size];
-	//initialise the gradient arrays used in Perlin noise
-	for (int i = 0; i < _size; i++)
-	{
-		gradsX[i] = double(rand()) / (RAND_MAX / 2) - 1.0f;
-		gradsY[i] = double(rand()) / (RAND_MAX / 2) - 1.0f;
-		//std::cout << gradsX[i] << " , " << gradsY[i] << std::endl;
-	}
+
+	//Initialise gradients at each grid node
+	//for (int i = 0; i < _size + 1; i++)
+	//{
+	//	double theta = double(rand()) / (RAND_MAX + 1.0f)* XM_PI * 2;
+	//	gradsX[i] = (double)cos(theta);
+	//	gradsY[i] = (double)sin(theta);
+	//	//std::cout << gradsX[i] << " , " << gradsY[i] << std::endl;
+	//}
 
 	int index = 0;
 
@@ -460,83 +456,21 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 	{
 		for (int j = 0; j < m_width; j++)
 		{
-			index = (m_width * j) + i;
+			index = (m_width * i) + j;
 			double x = (double)j / (double)m_width;
 			double y = (double)i / (double)m_height;
 			//std::cout << x << " , " << y << std::endl;
-			int random = rand() % 256;
-			m_heightmap[index].gradx = gradsX[random];
-			m_heightmap[index].grady = gradsY[random];
-			m_heightmap[index].height = generatePerlin(x, y) * 255.0f;
+			double height = perlin->FBM(x, y, 0.8, 8, 0.5) * 20.0f;
+			//std::cout << height << std::endl;
+			//height -= floor(height);
+			m_heightmap[index].height = height;
+
 			//std::cout << m_heightmap[index].height << std::endl;
 		}
 	}
 	init(GD);
-	normaliseHeightmap();
+	//normaliseHeightmap();
 	//raiseTerrain();
 	//initialiseNormals();
-
-}
-
-//This algorithm is a combination of these two tutorials:
-//http://www.angelcode.com/dev/perlin/perlin.html
-//http://flafla2.github.io/2014/08/09/perlinnoise.html
-double VBTerrain::generatePerlin(double x, double y)
-{
-	//calculate where the square the input falls into is located
-	int x0 = (int)floorf(x);
-	int x1 = x0 + 1;
-
-	int y0 = (int)floorf(y);
-	int y1 = y0 + 1;
-
-	//calculate input point's position within the unit square
-	float pX0 = x - floorf(x);
-	float pX1 = pX0 - 1;
-
-	float pY0 = y - floorf(y);
-	float pY1 = pY0 - 1;
-
-	//permutate values to get indices to use with the gradient look-up tables
-	//then get the dot product between the gradient and sample position vector
-	int index = m_p[(y0 + m_p[x0])];
-	//std::cout << index << std::endl;
-	double vecAA = gradsX[index] * pX0 + gradsY[index] * pY0;
-
-	index = m_p[(y0 + m_p[x1])];
-	double vecAB = gradsX[index] * pX1 + gradsY[index] * pY0;
-
-	index = m_p[(y1 + m_p[x0])];
-	double vecBA = gradsX[index] * pX0 + gradsY[index] * pY1;
-
-	index = m_p[(y1 + m_p[x1])];
-	double vecBB = gradsX[index] * pX1 + gradsY[index] * pY1;
-	//std::cout << vecAA << " , " << vecAB << " , " << vecBA << " , " << vecBB << std::endl;
-	
-	//compute the fade curves for each value
-	double u = fade(x);
-	double v = fade(y);
-
-	//interpolate the resulting dot products
-	double r1, r2, result;
-
-	r1 = lerp(vecAA, vecAB, u);
-	r2 = lerp(vecBA, vecBB, u);
-
-	result = lerp(r1, r2, v);
-	
-	//std::cout << result << std::endl;
-	
-	return (result + 1)/2;
-}
-
-double VBTerrain::fade(double t)
-{
-	return t * t * t * (t * (t * 6 - 15) + 10);	//Ken Perlin's improved function
-}
-
-//linearly interpolates the two points by a weight factor
-double VBTerrain::lerp(double a, double b, double weight)
-{
-	return a + weight * (b - a);
+	delete perlin;
 }

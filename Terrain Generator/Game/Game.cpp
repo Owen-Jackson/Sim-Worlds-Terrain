@@ -12,7 +12,7 @@
 #include "drawdata.h"
 #include "DrawData2D.h"
 
-//#include <AntTweakBar.h>
+#include <AntTweakBar.h>
 #include <iostream>
 
 using namespace DirectX;
@@ -51,6 +51,7 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	hr = m_pDirectInput->CreateDevice(GUID_SysMouse, &m_pMouse, NULL);
 	hr = m_pMouse->SetDataFormat(&c_dfDIMouse);
 	hr = m_pMouse->SetCooperativeLevel(m_hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+	ShowCursor(true);
 
 	//create GameData struct and populate its pointers
 	m_GD = new GameData;
@@ -81,6 +82,11 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	UINT width = rc.right - rc.left;
 	UINT height = rc.bottom - rc.top;
 	float AR = (float)width / (float)height;
+
+	//Initialise AntTweakBar for parameters
+	TwInit(TW_DIRECT3D11, _pd3dDevice);
+	TwWindowSize(200, 500);
+	TwBar *optionsBar = TwNewBar("Parameters");
 
 	//create a base camera
 	m_cam = new Camera(0.25f * XM_PI, AR, 1.0f, 10000.0f, Vector3::UnitY, Vector3::Zero);
@@ -113,7 +119,7 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	//Add terrain from the terrain generator
 	//VBTerrain* terrain = new VBTerrain();
 	//terrain->initWithHeightMap(_pd3dDevice, "../Assets/HeightMaps/Australia.bmp");
-	////terrain->writeToBmp("testwrite.bmp");
+	//terrain->writeToBmp("testwrite.bmp");
 	//terrain->buildMesh(_pd3dDevice);
 	//m_GameObjects.push_back(terrain);
 
@@ -211,9 +217,12 @@ bool Game::Tick()
 	}
 
 	//lock the cursor to the centre of the window
-	RECT window;
-	GetWindowRect(m_hWnd, &window);
-	SetCursorPos((window.left + window.right) >> 1, (window.bottom + window.top) >> 1);
+	if (m_GD->m_GS == GS_PLAY_FPS_CAM)
+	{
+		RECT window;
+		GetWindowRect(m_hWnd, &window);
+		SetCursorPos((window.left + window.right) >> 1, (window.bottom + window.top) >> 1);
+	}
 
 	//calculate frame time-step dt for passing down to game objects
 	DWORD currentTime = GetTickCount();
@@ -317,6 +326,8 @@ void Game::Draw(ID3D11DeviceContext* _pd3dImmediateContext)
 
 	//drawing text screws up the Depth Stencil State, this puts it back again!
 	_pd3dImmediateContext->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+
+	TwDraw();
 };
 
 
