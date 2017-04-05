@@ -10,7 +10,6 @@
 #include "ObjectList.h"
 #include "GameData.h"
 #include "drawdata.h"
-#include "DrawData2D.h"
 
 #include <AntTweakBar.h>
 #include <iostream>
@@ -31,9 +30,6 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	//Create DirectXTK spritebatch stuff
 	ID3D11DeviceContext* pd3dImmediateContext;
 	_pd3dDevice->GetImmediateContext(&pd3dImmediateContext);
-	m_DD2D = new DrawData2D();
-	m_DD2D->m_Sprites.reset(new SpriteBatch(pd3dImmediateContext));
-	m_DD2D->m_Font.reset(new SpriteFont(_pd3dDevice, L"..\\Assets\\italic.spritefont"));
 
 	//seed the random number generator
 	srand((UINT)time(NULL));
@@ -94,11 +90,12 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	m_GameObjects.push_back(m_cam);
 
 	//create a base light
-	m_light = new Light(Vector3(0.0f, 100.0f, 160.0f), Color(1.0f, 1.0f, 1.0f, 1.0f), Color(0.1f, 0.1f, 0.1f, 1.0f));
+	m_light = new Light(Vector3(0.0f, 500.0f, 160.0f), Color(1.0f, 1.0f, 1.0f, 1.0f), Color(0.1f, 0.1f, 0.1f, 1.0f));
 	m_GameObjects.push_back(m_light);
 
 	//add Player
 	Player* pPlayer = new Player("BirdModelV1.cmo", _pd3dDevice, m_fxFactory);
+	pPlayer->SetYaw(-XM_PI / 2 - XM_PI / 4);
 	m_GameObjects.push_back(pPlayer);
 
 	//add a secondary camera
@@ -116,33 +113,29 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	m_DD->m_cam = m_cam;
 	m_DD->m_light = m_light;
 
-	//Add terrain from the terrain generator
-	//VBTerrain* terrain = new VBTerrain();
-	//terrain->initWithHeightMap(_pd3dDevice, "../Assets/HeightMaps/Australia.bmp");
-	//terrain->writeToBmp("testwrite.bmp");
-	//terrain->buildMesh(_pd3dDevice);
-	//m_GameObjects.push_back(terrain);
+	//The blocks of code below show two ways to initialise terrains
+	//Change which one is commented to use
 
-	//Testing perlin noise
-	VBTerrain* perlin = new VBTerrain();
-	perlin->initWithPerlin(1024, _pd3dDevice);
-	perlin->writeToBmp("PerlinTestWrite.bmp");
-	perlin->readFromBmp("../Assets/HeightMaps/PerlinTestWrite.bmp");
-	perlin->normaliseHeightmap();
-	perlin->raiseTerrain();
-	perlin->initialiseNormals();
-	perlin->buildMesh(_pd3dDevice);
-	m_GameObjects.push_back(perlin);
+	//Create terrain from pre-made heightmap
+	//See Assets/Heightmaps folder for other files
 
-	////example basic 2D stuff
-	//ImageGO2D* logo = new ImageGO2D("logo_small", _pd3dDevice);
-	//logo->SetPos(200.0f * Vector2::One);
-	//m_GameObject2Ds.push_back(logo);
+	pPlayer->SetPos(Vector3(0.0f, 100.0f, 0.0f));
+	VBTerrain* terrain = new VBTerrain();
+	terrain->initWithHeightMap(_pd3dDevice, "../Assets/HeightMaps/Australia.bmp");
+	terrain->buildMesh(_pd3dDevice);
+	m_GameObjects.push_back(terrain);
 
-	//TextGO2D* text = new TextGO2D("Test Text");
-	//text->SetPos(Vector2(100, 10));
-	//text->SetColour(Color((float*)&Colors::Yellow));
-	//m_GameObject2Ds.push_back(text);
+	//Generate terrain from perlin noise
+
+	//pPlayer->SetPos(Vector3(0.0f, 260.0f, 0.0f));
+	//VBTerrain* perlin = new VBTerrain();
+	//perlin->initWithPerlin(1024, _pd3dDevice);
+	//perlin->writeToBmp("PerlinTestWrite.bmp");
+	//perlin->readFromBmp("../Assets/HeightMaps/PerlinTestWrite.bmp");
+	//perlin->raiseTerrain();
+	//perlin->initialiseNormals();
+	//perlin->buildMesh(_pd3dDevice);
+	//m_GameObjects.push_back(perlin);
 };
 
 
@@ -179,19 +172,9 @@ Game::~Game()
 	m_GameObjects.clear();
 
 
-	//and the 2D ones
-	for (list<GameObject2D *>::iterator it = m_GameObject2Ds.begin(); it != m_GameObject2Ds.end(); it++)
-	{
-		delete (*it);
-	}
-	m_GameObject2Ds.clear();
-
 	//clear away CMO render system
 	delete m_states;
 	delete m_fxFactory;
-
-	delete m_DD2D;
-
 };
 
 bool Game::Tick() 
@@ -277,10 +260,6 @@ void Game::PlayTick()
 	{
 		(*it)->Tick(m_GD);
 	}
-	for (list<GameObject2D *>::iterator it = m_GameObject2Ds.begin(); it != m_GameObject2Ds.end(); it++)
-	{
-		(*it)->Tick(m_GD);
-	}
 }
 
 void Game::Draw(ID3D11DeviceContext* _pd3dImmediateContext) 
@@ -315,14 +294,6 @@ void Game::Draw(ID3D11DeviceContext* _pd3dImmediateContext)
 			(*it)->Draw(m_DD);
 		}
 	}
-
-	// Draw sprite batch stuff 
-	m_DD2D->m_Sprites->Begin();
-	for (list<GameObject2D *>::iterator it = m_GameObject2Ds.begin(); it != m_GameObject2Ds.end(); it++)
-	{
-		(*it)->Draw(m_DD2D);
-	}
-	m_DD2D->m_Sprites->End();
 
 	//drawing text screws up the Depth Stencil State, this puts it back again!
 	_pd3dImmediateContext->OMSetDepthStencilState(m_states->DepthDefault(), 0);

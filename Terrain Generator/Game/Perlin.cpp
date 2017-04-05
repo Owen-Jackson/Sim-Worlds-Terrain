@@ -11,11 +11,9 @@ Perlin::~Perlin()
 Perlin::Perlin(int _seed)
 {
 	p.resize(256);
-	//p.insert(p.end(), p.begin(), p.end());
 	for (int i = 0; i < p.size(); i++)
 	{
 		p[i] = i;
-		std::cout << i << std::endl;
 	}
 
 	std::default_random_engine engine(_seed);
@@ -25,9 +23,8 @@ Perlin::Perlin(int _seed)
 	p.insert(p.end(), p.begin(), p.end());
 }
 
-//This algorithm is a combination of these two tutorials:
-//http://www.angelcode.com/dev/perlin/perlin.html
-//http://flafla2.github.io/2014/08/09/perlinnoise.html
+//This algorithm uses Ken Perlin's own implementation:
+//http://mrl.nyu.edu/~perlin/noise/
 double Perlin::generateNoise(double x, double y, double z)
 {
 	int X = (int)floor(x) & 255,                  // FIND UNIT CUBE THAT
@@ -56,15 +53,10 @@ double Perlin::generateNoise(double x, double y, double z)
 	x2 = lerp(grad(p[AB + 1], x, y - 1, z - 1), grad(p[BB + 1], x - 1, y - 1, z - 1), u);
 	double r2 = lerp(x1, x2, v);
 
+	//result will range between -1 and 1
 	double result = lerp(r1, r2, w);
 
-	//if ((result + 1.0f) / 2 > 1 || (result + 1.0f) / 2 < 0)
-	//{
-	//	std::cout << x << " , " << y << " , " << z << " , " << oldZ << std::endl;
-	//	std::cout <<"r1: " << r1 << ", r2: " << r2 << ", result: " << (result + 1.0f) / 2 << std::endl;
-	//	std::cout << "hashes: " << A << ", " << AA << ", " << AB << ", " << B << ", " << BA << ", " << BB << std::endl;
-	//	std::cout << std::endl;
-	//}
+	//normalise result to be between 0 and 1
 	return (result + 1.0f) / 2;
 }
 
@@ -84,19 +76,17 @@ double Perlin::FBM(double x, double y, double z, int octaves, double persistence
 	double total = 0;
 	double frequency = 1;
 	double amplitude = 1;
-	double maxValue = 0;	//Used to normalise the result to 0.0 - 1.0
+	double maxValue = 0;	//Used to normalise the result to between 0.0 and 1.0
+	//generate perlin noise multiple times based on number of octaves
 	for (int i = 0; i < octaves; i++)
 	{
 		total += generateNoise(x * frequency, y * frequency, z * frequency) * amplitude;
-		//std::cout << total << std::endl;
 		maxValue += amplitude;
 
 		amplitude *= persistence;
 		frequency *= 2;
 
 	}
-	//std::cout << total / maxValue;
-	//std::cout << std::endl;
 	return total / maxValue;
 }
 

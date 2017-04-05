@@ -10,14 +10,8 @@
     <Filter Include="Models">
       <UniqueIdentifier>{64fc769d-bad4-4c24-bf49-281a0d86541d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="VBGO Files">
-      <UniqueIdentifier>{3a8825a5-02bb-4758-9e25-9d85f225fd2b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Textures">
       <UniqueIdentifier>{d0ca2129-2972-476d-82a9-1f0a9000b117}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeightMaps">
-      <UniqueIdentifier>{37886da4-c424-440c-b763-2ee32768c2de}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -32,37 +26,8 @@
     <MeshContentTask Include="Bird\BirdModelV1.fbx">
       <Filter>Models</Filter>
     </MeshContentTask>
-    <MeshContentTask Include="Table\table.FBX">
-      <Filter>Models</Filter>
-    </MeshContentTask>
-    <MeshContentTask Include="Vase\JEMINA vase -up.fbx">
-      <Filter>Models</Filter>
-    </MeshContentTask>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="baseline.txt">
-      <Filter>VBGO Files</Filter>
-    </Text>
-    <Text Include="cube.txt">
-      <Filter>VBGO Files</Filter>
-    </Text>
-    <Text Include="terrainTex.txt">
-      <Filter>VBGO Files</Filter>
-    </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <ImageContentTask Include="grass.jpg">
-      <Filter>Textures</Filter>
-    </ImageContentTask>
-    <ImageContentTask Include="white.jpg">
-      <Filter>Textures</Filter>
-    </ImageContentTask>
-    <ImageContentTask Include="logo_small.png">
-      <Filter>Textures</Filter>
-    </ImageContentTask>
-    <ImageContentTask Include="Heightmaps\TestMap.bmp">
-      <Filter>HeightMaps</Filter>
-    </ImageContentTask>
     <ImageContentTask Include="Textures\Debug Texture.jpg">
       <Filter>Textures</Filter>
     </ImageContentTask>

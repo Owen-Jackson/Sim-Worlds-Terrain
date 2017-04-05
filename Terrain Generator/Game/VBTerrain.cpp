@@ -46,6 +46,11 @@ void VBTerrain::init(ID3D11Device* GD)
 		for (int j = 0; j < m_width - 1; j++)
 		{
 			//The comments below represent the vertex number in the current quad 
+			//Each quad looks like this
+			//1 - 2
+			//| / |
+			//3 - 4
+
 			//1
 			m_vertices[vert].Color = Color(1.0f, 1.0f, 1.0f, 1.0f);
 			m_vertices[vert].Pos = Vector3((float)i, (float)(0), (float)j);
@@ -209,6 +214,8 @@ bool VBTerrain::readFromBmp(char* _filename)
 		return false;
 	}
 
+	std::cout << "Reading image data from file\n";
+
 	//read in the file header
 	count = fread(&bitmapFileHeader, sizeof(BITMAPFILEHEADER), 1, filePtr);
 	if (count != 1)
@@ -255,8 +262,6 @@ bool VBTerrain::readFromBmp(char* _filename)
 		imageSize = ((m_width * 3) + 1) * m_height;
 	}
 
-	std::cout << imageSize << std::endl;
-
 	//allocate memory for the bitmap image data
 	bitmapImage = new unsigned char[imageSize];
 	if (!bitmapImage)
@@ -283,6 +288,7 @@ bool VBTerrain::readFromBmp(char* _filename)
 		return false;
 	}
 
+	std::cout << "Read from file complete\nSetting up heightmap from image data\n";
 	//create the heightmap that stores the data
 	m_heightmap = new HeightMap[m_width * m_height];
 	if (!m_heightmap)
@@ -317,6 +323,8 @@ bool VBTerrain::readFromBmp(char* _filename)
 		}
 	}
 
+	std::cout << "Heightmap setup complete\n\n";
+
 	//release the bitmap data
 	delete[] bitmapImage;
 	bitmapImage = 0;
@@ -333,13 +341,12 @@ bool VBTerrain::writeToBmp(std::string _filename)
 	unsigned char* image;
 	int padding = 0;	//padding for end of each row if width is not multiple of 4
 
-	std::cout << "padding: " << m_width << " %  4 = " << m_width % 4 << std::endl;
+	std::cout << "Setting up image data\n";
 
 	if ((m_width * 3) % 4 != 0)
 	{
 		padding = 4 - ((m_width * 3) % 4);
 	}
-	std::cout << padding << std::endl;
 
 	//set file header and info header variables
 	fileHeader.bfType = 'MB';
@@ -380,11 +387,11 @@ bool VBTerrain::writeToBmp(std::string _filename)
 		}
 		for (int k = 0; k < padding; k++)
 		{
-			std::cout << "adding padding" << std::endl;
 			image[index++] = (float) 0.0f;
 		}
 	}
 
+	std::cout << "Image data setup complete\n";
 	int error = 0;
 
 	//open a new file to write to
@@ -394,6 +401,8 @@ bool VBTerrain::writeToBmp(std::string _filename)
 		std::cout << "error : could not open file to write to\n";
 		return false;
 	}
+
+	std::cout << "Writing to file\n";
 
 	//write in the file header
 	error = fwrite(&fileHeader, sizeof(BITMAPFILEHEADER), 1, filePtr);
@@ -422,6 +431,7 @@ bool VBTerrain::writeToBmp(std::string _filename)
 		return false;
 	}
 
+	std::cout << "File write complete\n\n";
 	delete[] image;
 	image = 0;
 
@@ -434,24 +444,12 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 	Perlin* perlin = new Perlin(rand() % 256);
 	m_width = _size;
 	m_height = _size;
-	//m_p = new int[512];
-	//for (int i = 0; i < 512; i++)
-	//{
-	//	m_p[i] = permutations[i % 256];
-	//}
 	m_heightmap = new HeightMap[m_width * m_height];
 
-	//Initialise gradients at each grid node
-	//for (int i = 0; i < _size + 1; i++)
-	//{
-	//	double theta = double(rand()) / (RAND_MAX + 1.0f)* XM_PI * 2;
-	//	gradsX[i] = (double)cos(theta);
-	//	gradsY[i] = (double)sin(theta);
-	//	//std::cout << gradsX[i] << " , " << gradsY[i] << std::endl;
-	//}
+	std::cout << "Generating perlin values\n";
 
 	int index = 0;
-
+	double min = 1, max = 0;
 	for (int i = 0; i < m_height; i++)
 	{
 		for (int j = 0; j < m_width; j++)
@@ -459,18 +457,26 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 			index = (m_width * i) + j;
 			double x = (double)j / (double)m_width;
 			double y = (double)i / (double)m_height;
-			//std::cout << x << " , " << y << std::endl;
-			double height = perlin->FBM(x, y, 0.8, 8, 0.5) * 20.0f;
-			//std::cout << height << std::endl;
-			//height -= floor(height);
+			double height = perlin->FBM(x, y, 0.0f, 4, 0.5);
+			if (height < min)
+			{
+				min = height;
+			}
+			if (height > max)
+			{
+				max = height;
+			}
 			m_heightmap[index].height = height;
-
-			//std::cout << m_heightmap[index].height << std::endl;
 		}
 	}
+
+	//nomrlaise the height values to scale between 0 and 1
+	for (int i = 0; i < m_height * m_width; i++)
+	{
+		m_heightmap[i].height = (m_heightmap[i].height - min) / (max - min);
+	}
+
+	std::cout << "Perlin generation complete\n\n";
 	init(GD);
-	//normaliseHeightmap();
-	//raiseTerrain();
-	//initialiseNormals();
 	delete perlin;
 }

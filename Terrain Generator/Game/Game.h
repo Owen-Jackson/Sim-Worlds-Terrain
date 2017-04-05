@@ -20,13 +20,11 @@ using namespace DirectX;
 
 // Forward declarations
 class GameObject;
-class GameObject2D;
 class Camera;
 class TPSCamera;
 class FPSCam;
 struct GameData;
 struct DrawData;
-struct DrawData2D;
 class Light;
 
 class Game
@@ -49,7 +47,6 @@ protected:
 	Light* m_light; //base light
 
 	list<GameObject *> m_GameObjects; //data structure storing all GameObjects of this Game
-	list<GameObject2D *> m_GameObject2Ds;//ditto 2D objects
 
 	//required for the CMO model rendering system
 	CommonStates* m_states;
@@ -67,7 +64,6 @@ protected:
 
 	GameData* m_GD;			//Data to be shared to all Game Objects as they are ticked
 	DrawData* m_DD;			//Data to be shared to all Game Objects as they are drawn
-	DrawData2D * m_DD2D;	//Data to be passed by game to all 2D Game Objects via Draw 
 
 	//sound stuff
 	std::unique_ptr<AudioEngine> m_audioEngine;

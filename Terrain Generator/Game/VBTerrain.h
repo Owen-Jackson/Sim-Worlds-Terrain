@@ -18,6 +18,7 @@ public:
 
 	//initialise the Veretx and Index buffers for the cube
 	void init(ID3D11Device* _GD);
+
 	void normaliseHeightmap();
 	void initialiseNormals();
 	void buildMesh(ID3D11Device* _GD);
