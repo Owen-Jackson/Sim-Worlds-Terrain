@@ -16,9 +16,11 @@ public:
 	VBTerrain() {};
 	virtual ~VBTerrain();
 
-	//initialise the Veretx and Index buffers for the cube
+	//initialise the vertices for a flat grid
 	void init(ID3D11Device* _GD);
 
+	//General functions
+	void raiseTerrain();
 	void normaliseHeightmap();
 	void initialiseNormals();
 	void buildMesh(ID3D11Device* _GD);
@@ -30,12 +32,9 @@ public:
 
 	//Perlin related functions
 	void initWithPerlin(int size, ID3D11Device* _GD);
-	void raiseTerrain();
 
 
 protected:
-	int m_chunkNum;
-	int m_verticesPerChunk = 10000;
 	int m_numVerts = 0;
 	struct HeightMap
 	{

@@ -81,7 +81,6 @@ float4 PS( PS_INPUT input) : SV_Target
 	//create colour constants
 	float4 SNOW = float4(255.0f / 255, 255.0f / 255, 255.0f / 255, 1.0f);
 	float4 MOUNTAIN = float4(169.0f / 255, 169.0f / 255, 169.0f / 255, 1.0f);
-	float4 CANYON = float4(205.0f / 255, 133.0f / 255, 63.0f / 255, 1.0f);
 	float4 GRASS = float4(34.0f / 255, 139.0f / 255, 34.0f / 255, 1.0f);
 	float4 SAND = float4(255.0f / 255, 165.0f / 255, 0.0f, 1.0f);
 	float4 WATER = float4(0.0f, 0.0f, 204.0f / 255, 1.0f);

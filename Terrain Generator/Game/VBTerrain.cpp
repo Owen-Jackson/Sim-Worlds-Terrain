@@ -16,17 +16,6 @@ void VBTerrain::init(ID3D11Device* GD)
 	//calculate number of vertices and primitives
 	m_numVerts = 6 * (m_width - 1) * (m_height - 1);
 
-	//calculate chunks (implement later for optimisation)
-	int current = 0;
-	while (current < m_numVerts)
-	{
-		if (current % m_verticesPerChunk == 0)
-		{
-			m_chunkNum++;
-		}
-		current++;
-	}
-
 	m_numPrims = m_numVerts / 3;
 	m_vertices = new myVertex[m_numVerts];
 	m_indices = new WORD[m_numVerts];
@@ -457,7 +446,7 @@ void VBTerrain::initWithPerlin(int _size, ID3D11Device* GD)
 			index = (m_width * i) + j;
 			double x = (double)j / (double)m_width;
 			double y = (double)i / (double)m_height;
-			double height = perlin->FBM(x, y, 0.0f, 4, 0.5);
+			double height = perlin->FBM(x, y, 0.0f, 4, 0.5);	//Change parameters here to produce different results
 			if (height < min)
 			{
 				min = height;

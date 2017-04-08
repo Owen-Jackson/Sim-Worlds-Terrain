@@ -50,10 +50,10 @@ HRESULT Application::InitWindow( HINSTANCE _hInstance, int _nCmdShow )
     // Create window
     m_hInst = _hInstance;
 #ifdef DEBUG
-	RECT rc = { 0, 0, 800, 600 };
+	RECT rc = { 0, 0, 1080, 720 };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
-	m_hWnd = CreateWindow(L"GEAWindowClass", L"GEA GROUP PROJECT", WS_OVERLAPPEDWINDOW,
-		600, 100, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, _hInstance,
+	m_hWnd = CreateWindow(L"GEAWindowClass", L"Terrain Generator od2-jackson", WS_OVERLAPPEDWINDOW,
+		720, 100, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, _hInstance,
 		nullptr);
 #else
 	int SCREEN_WIDTH = GetSystemMetrics(SM_CXSCREEN);

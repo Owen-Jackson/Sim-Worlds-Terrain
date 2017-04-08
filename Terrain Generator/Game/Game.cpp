@@ -237,14 +237,6 @@ void Game::PlayTick()
 	if ((m_keyboardState[DIK_1] & 0x80) && !(m_prevKeyboardState[DIK_1] & 0x80) && m_GD->m_GS != GS_PLAY_MAIN_CAM)
 	{
 		m_GD->m_GS = GS_PLAY_MAIN_CAM;
-		/*if (m_GD->m_GS == GS_PLAY_MAIN_CAM)
-		{
-			m_GD->m_GS = GS_PLAY_TPS_CAM;
-		}
-		else
-		{
-			m_GD->m_GS = GS_PLAY_MAIN_CAM;
-		}*/
 	}
 	else if ((m_keyboardState[DIK_2] & 0x80) && !(m_prevKeyboardState[DIK_2] & 0x80) && m_GD->m_GS != GS_PLAY_TPS_CAM)
 	{
